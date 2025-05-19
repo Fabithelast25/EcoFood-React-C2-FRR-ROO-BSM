@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { getAuth, createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 import { app } from './firebaseConfig';
 
 const auth = getAuth(app);
+const db = getFirestore(app);
 
 function Registro() {
   const [email, setEmail] = useState('');
@@ -35,14 +37,20 @@ function Registro() {
 
       await sendEmailVerification(user);
 
-      setSuccess('Usuario registrado con éxito. Se ha enviado un correo de verificación a: ' + user.email);
-      console.log('Usuario registrado:', {
+      // Guardar datos adicionales en Firestore
+      await setDoc(doc(db, 'usuarios', user.uid), {
         email,
         nombreCompleto,
         direccion,
         comuna,
         telefono,
+        tipo_usuario: 'Cliente',
+        email_verificado: false,
+        creado: new Date()
       });
+
+      setSuccess('Usuario registrado con éxito. Se ha enviado un correo de verificación.');
+      console.log('Usuario registrado y guardado en Firestore:', user.uid);
     } catch (error) {
       setError('Error al registrar el usuario: ' + error.message);
       console.error(error);
