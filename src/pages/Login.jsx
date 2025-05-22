@@ -51,9 +51,9 @@ export default function Login() {
                     required 
                 /> 
                 </div> 
-                <RecuperarContraseña/>
                 <button type="submit" className="btn btn-primary">Iniciar Sesión</button> 
             </form> 
+                <RecuperarContraseña/>
         </div> 
     ); 
 }
