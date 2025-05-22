@@ -11,11 +11,11 @@ export default function Register() {
   const [nombre, setNombre] = useState("");
   const [tipo, setTipo] = useState("cliente");
   const navigate = useNavigate();
-
+  
   const validarPassword = (pass) => {
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$/;
-    return regex.test(pass);
-  };
+  const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}$/;
+  return regex.test(pass);
+};
 
   const handleRegister = async (e) => {
     e.preventDefault();
