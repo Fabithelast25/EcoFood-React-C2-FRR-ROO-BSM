@@ -5,11 +5,19 @@ import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { saveUserData } from "../services/userService"; // Aquí puedes guardar en Firestore
 
+//Nombre completo
+//Correo electrónico
+//Contraseña robusta
+
+//Teléfono (opcional)
+
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nombre, setNombre] = useState("");
-  const [tipo, setTipo] = useState("cliente");
+  const [tipo, setTipo] = useState("");
+  const [comuna, setComuna] = useState("");
+  const [direccion, setDireccion] = useState("");
   const navigate = useNavigate();
   
   const validarPassword = (pass) => {
@@ -80,6 +88,17 @@ export default function Register() {
             required
           />
         </div>
+
+        <div className="mb-3">
+            <label className="form-label">Direccion</label>
+            <input
+              type="text"
+              className="form-control"
+              value={direccion}
+              onChange={(e) => setDireccion(e.target.value)}
+              required
+            />
+        </div>
         <div className="mb-3">
           <label className="form-label">Tipo de usuario</label>
           <select
@@ -88,10 +107,26 @@ export default function Register() {
             onChange={(e) => setTipo(e.target.value)}
           >
             <option value="cliente">Cliente</option>
-            <option value="empresa">Empresa</option>
-            <option value="admin">Administrador</option>
           </select>
         </div>
+
+        
+        <div className="mb-3">
+          <label className="form-label">Comuna/Ciudad</label>
+          <select
+            className="form-select"
+            value={comuna}
+            onChange={(e) => setComuna(e.target.value)}
+          >
+            <option value="La Serena">La Serena</option>
+            <option value="Vicuña">Vicuña</option>
+            <option value="Ovalle">Ovalle</option>
+            <option value="Coquimbo">Coquimbo</option>
+            <option value="Santiago">Santiago</option>
+            
+          </select>
+        </div>
+        
         <button type="submit" className="btn btn-success">Registrar</button>
       </form>
     </div>
