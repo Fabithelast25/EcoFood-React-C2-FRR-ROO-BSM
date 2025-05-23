@@ -10,6 +10,7 @@ return (
         <Route path="/login" element={<Login />} />
         <Route path="/" element={<> hola como estampos</>} />
         <Route path="/registro" element={<Register />} />
+        <Route path="/recuperar-password" element={<RecuperarContraseña />} />
         <Route path="/home" element={ 
             <ProtectedRoute> 
                 <Home /> 
