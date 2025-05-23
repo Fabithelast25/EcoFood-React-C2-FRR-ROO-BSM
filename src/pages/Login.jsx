@@ -53,7 +53,7 @@ export default function Login() {
                 </div> 
                 <button type="submit" className="btn btn-primary">Iniciar Sesión</button> 
             </form> 
-                <RecuperarContraseña/>
+                <Link to="/recuperar-password">Recuperar Contraseña</Link>
         </div> 
     ); 
 }
