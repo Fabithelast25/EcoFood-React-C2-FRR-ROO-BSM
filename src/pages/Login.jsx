@@ -7,7 +7,7 @@ import {
 } from "firebase/auth"; 
 import { auth } from "../services/firebase"; 
 import Swal from "sweetalert2"; 
-import RecuperarContraseña from "../components/RecuperarContraseña";
+import { Link } from 'react-router-dom';
  
 export default function Login() { 
     const [email, setEmail] = useState(""); 
@@ -54,6 +54,7 @@ export default function Login() {
                 <button type="submit" className="btn btn-primary">Iniciar Sesión</button> 
             </form> 
                 <Link to="/recuperar-password">Recuperar Contraseña</Link>
+                <button type="button" className="btn btn-success"><Link to="/registro" style={{ color: 'white', textDecoration: 'none' }}>Crear Cuenta Nueva</Link></button>
         </div> 
     ); 
 }
