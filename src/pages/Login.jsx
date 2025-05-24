@@ -8,6 +8,7 @@ import {
 import { auth } from "../services/firebase";
 import Swal from "sweetalert2";
 import { Link } from 'react-router-dom';
+import { getUserData } from "../services/userService";
 
 export default function Login() {
   const [email, setEmail] = useState("");

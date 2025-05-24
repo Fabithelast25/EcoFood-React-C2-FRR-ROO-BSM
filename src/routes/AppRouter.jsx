@@ -4,13 +4,13 @@ import Register from "../pages/Register";
 import Home from "../pages/Home"
 import ProtectedRoute from './ProtectedRoute'
 import RecuperarContraseña from "../pages/RecuperarContraseña";
-import ProtectedByRole from "./protectedByRole";
+import ProtectedByRole from './ProtectedByRole';
 
 
 //Admin
 import AdminLayout from '../components/admin/layout/AdminLayout';
 import AdminDashboard from "../pages/admin/AdminDashboard";
-
+import AdminAdministradores from "../pages/admin/AdminAdministradores";
 
 export default function AppRouter() {
     return (
@@ -30,8 +30,8 @@ export default function AppRouter() {
                     <AdminLayout/>
                 </ProtectedByRole>
         }>
-            <Route path="dashboard" element={<AdminDashboard/>} />
-            <Route path="Administradores" element={<AdminAdministradores/>} />
+                <Route path="dashboard" element={<AdminDashboard/>} />
+                <Route path="administradores" element={<AdminAdministradores/>} />
             </Route>
         </Routes>
     );

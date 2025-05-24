@@ -15,7 +15,7 @@ export const registrarAdministradorConAuth = async (datos) => {
       nombre: datos.nombre || "",
       comuna: datos.comuna || "",
       direccion: datos.direccion || "",
-      tipo: "Admin",
+      tipo: "admin",
       email: datos.email || "",
       principal: false
     });
@@ -31,7 +31,7 @@ export const getAdministradores = async () => {
   const snapshot = await getDocs(collection(db, "usuarios"));
   return snapshot.docs
     .map(doc => ({ id: doc.id, ...doc.data() }))
-    .filter(user => user.tipo === "Admin");
+    .filter(user => user.tipo === "admin");
 };
 
 export const updateAdministrador = async (id, nuevosDatos) => {
