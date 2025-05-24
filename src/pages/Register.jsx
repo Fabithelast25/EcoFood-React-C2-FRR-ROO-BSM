@@ -4,6 +4,7 @@ import { auth } from "../services/firebase";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import { saveUserData } from "../services/userService"; // Aquí puedes guardar en Firestore
+import { Link } from 'react-router-dom';
 
 //Nombre completo
 //Correo electrónico
@@ -56,6 +57,7 @@ export default function Register() {
 
   return (
     <div className="container mt-5">
+      <button type="button" className="btn btn-primary"><Link to="/login" style={{ color: 'white', textDecoration: 'none' }}>Volver</Link></button>
       <h2>Registro</h2>
       <form onSubmit={handleRegister}>
         <div className="mb-3">
