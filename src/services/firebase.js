@@ -1,18 +1,38 @@
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-    appId: import.meta.env.VITE_FIREBASE_APP_ID
+import { db, secondaryAuth } from "./firebase";
+import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import {
+    collection,
+    query,
+    where,
+    getDocs,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    setDoc,
+    doc
+} from "firebase/firestore";
+
+export const registrarClienteConAuth = async (datos) => {
+    try {
+        const cred = await createUserWithEmailAndPassword(
+            secondaryAuth,
+            datos.email,
+            datos.password
+        );
+        await sendEmailVerification(cred.user);
+
+        await setDoc(doc(db, "usuarios", cred.user.uid), {
+            nombre: datos.nombre || "",
+            comuna: datos.comuna || "",
+            direccion: datos.direccion || "",
+            tipo: "cliente",
+            email: datos.email || ""
+        });
+
+        await secondaryAuth.signOut();
+        return cred;
+    } catch (error) {
+        console.error("Error registrando cliente:", error);
+        throw error;
+    }
 };
-const app = initializeApp(firebaseConfig);
-
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-
-const secondaryApp = initializeApp(firebaseConfig, "Secondary");
-export const secondaryAuth = getAuth(secondaryApp);
