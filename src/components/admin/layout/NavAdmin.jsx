@@ -20,6 +20,9 @@ export default function NavAdmin() {
                         <li className="nav-item">
                             <Link className="nav-link" to="/admin/administradores">Administradores</Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/admin/empresas">Empresas</Link>
+                        </li>
                     </ul>
                     <span className="navbar-text">
                         <CerrarSesion />
