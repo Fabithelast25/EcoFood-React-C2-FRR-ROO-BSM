@@ -32,6 +32,7 @@ export default function AppRouter() {
         }>
                 <Route path="dashboard" element={<AdminDashboard/>} />
                 <Route path="administradores" element={<AdminAdministradores/>} />
+                <Route path="empresas" element={<AdminEmpresas/>} />
             </Route>
         </Routes>
     );
