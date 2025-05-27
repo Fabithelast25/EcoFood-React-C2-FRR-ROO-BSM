@@ -13,7 +13,36 @@ export default function AdminClientes() {
         setClientes(data);
     };
 
+    const validarPassword = (pass) => {
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}$/;
+    return regex.test(pass);
+  };
+
+
     const guardar = async () => {
+        const { nombre, email, password, Comuna,  } = formData;
+
+        if (!nombre || nombre.length < 3) {
+        Swal.fire("Nombre inválido", "Debe tener al menos 3 caracteres.", "warning");
+        return;
+        }
+
+        if (!email.includes("@") || email.length < 6) {
+        Swal.fire("Correo inválido", "Introduce un correo electrónico válido.", "warning");
+        return;
+        }
+
+        if ( !validarPassword(password)) {
+        Swal.fire("Contraseña inválida", "Debe tener al menos 6 caracteres, incluyendo letras y números.", "warning");
+        return;
+        }
+
+        if ( Comuna && Comuna.replace(/\D/g, "").length !== 11) {
+        Swal.fire("comuna inválida", "Seleccione una");
+        return;
+        }
+
+
         if (clienteActivo) {
             await updateCliente(clienteActivo.id, formData);
         } else {
@@ -115,17 +144,31 @@ export default function AdminClientes() {
                                         setFormData({ ...formData, email: e.target.value })
                                     }
                                 />
-                                <input
+                                <select
                                     className="form-control mb-2"
-                                    placeholder="Comuna"
+                                    placeholder="Seleccione Comuna"
                                     value={formData.comuna}
                                     onChange={(e) =>
                                         setFormData({ ...formData, comuna: e.target.value })
                                     }
+                                >
+                                    <option value="">Seleccione</option>
+                                    <option value="La Serena">La Serena</option>
+                                    <option value="Vicuña">Vicuña</option>
+                                    <option value="Ovalle">Ovalle</option>
+                                    <option value="Coquimbo">Coquimbo</option>
+                                    <option value="Santiago">Santiago</option>
+                                </select>
+                                <input type="password" 
+                                className="form-control mb-2" 
+                                placeholder="Contraseña"
+                                value={formData.password} 
+                                onChange={(e) => setFormData({ ...formData, password:e.target.value })} 
+                                minLength={6}
+                                maxLength={50}
+                                required
+                                
                                 />
-                                <input type="password" className="form-control mb-2" placeholder="Contraseña"
-                                value={formData.password} onChange={(e) => setFormData({ ...formData, password:
-                                e.target.value })} />
                             </div>
                             <div className="modal-footer">
                                 <button
