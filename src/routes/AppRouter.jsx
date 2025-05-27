@@ -20,6 +20,7 @@ export default function AppRouter() {
             <Route path="/" element={<Login />} />
             <Route path="/registro" element={<Register />} />
             <Route path="/recuperar-password" element={<RecuperarContraseña />} />
+            <Route path="*" element={<NotFound />} />
             <Route path="/home" element={ 
                 <ProtectedRoute> 
                     <Home /> 
