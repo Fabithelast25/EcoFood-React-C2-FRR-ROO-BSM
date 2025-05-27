@@ -11,6 +11,8 @@ import ProtectedByRole from './ProtectedByRole';
 import AdminLayout from '../components/admin/layout/AdminLayout';
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminAdministradores from "../pages/admin/AdminAdministradores";
+import AdminClientes from "../pages/admin/AdminClientes";
+import AdminEmpresas from "../pages/admin/AdminEmpresas";
 
 export default function AppRouter() {
     return (
@@ -19,6 +21,7 @@ export default function AppRouter() {
             <Route path="/" element={<Login />} />
             <Route path="/registro" element={<Register />} />
             <Route path="/recuperar-password" element={<RecuperarContraseña />} />
+            <Route path="clientes" element={<AdminClientes/>} />
             <Route path="/home" element={ 
                 <ProtectedRoute> 
                     <Home /> 
