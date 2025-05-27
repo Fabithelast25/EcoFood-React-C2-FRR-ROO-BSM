@@ -148,8 +148,8 @@ export default function AdminEmpresas() {
               <td>{e.direccion}</td>
               <td>{e.comuna}</td>
               <td>{e.email}</td>
+              <td>{e.telefono}</td>
               <td>
-                {e.telefono}
                 <div className="mt-2">
                   <button
                     className="btn btn-warning btn-sm me-2"

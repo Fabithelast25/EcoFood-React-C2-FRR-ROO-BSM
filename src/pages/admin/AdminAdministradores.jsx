@@ -16,15 +16,62 @@ export default function AdminAdministradores() {
     email: "",
     comuna: "",
     direccion: "",
+    telefono: "",
     password: ""
   });
+
 
   const cargarAdmins = async () => {
     const data = await getAdministradores();
     setAdmins(data);
   };
 
-  const guardar = async () => {
+  const validarPassword = (pass) => {
+    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}$/;
+    return regex.test(pass);
+  };
+
+  const formatearTelefono = (valor) => {
+    const numeros = valor.replace(/\D/g, "").slice(0, 11);
+    if (numeros.length >= 11) {
+      return `+56 ${numeros[2]} ${numeros.slice(3, 7)} ${numeros.slice(7, 11)}`;
+    }
+    return valor;
+  };
+
+  const handleTelefonoChange = (e) => {
+    const input = e.target.value;
+    const numeros = input.replace(/\D/g, "");
+    setFormData({ ...formData, telefono: formatearTelefono(numeros) });
+  };
+const guardar = async () => {
+    const { nombre, email, password, telefono, comuna, direccion } = formData;
+
+    if (!nombre || nombre.length < 3) {
+      Swal.fire("Nombre inválido", "Debe tener al menos 3 caracteres.", "warning");
+      return;
+    }
+
+    if (!email.includes("@") || email.length < 6) {
+      Swal.fire("Correo inválido", "Introduce un correo electrónico válido.", "warning");
+      return;
+    }
+
+    if (!adminActivo && !validarPassword(password)) {
+      Swal.fire("Contraseña inválida", "Debe tener al menos 6 caracteres, incluyendo letras y números.", "warning");
+      return;
+    }
+
+    if (telefono && telefono.replace(/\D/g, "").length !== 11) {
+      Swal.fire("Teléfono inválido", "Debe contener exactamente 11 dígitos (Ej: +56 9 1234 5678)", "warning");
+      return;
+    }
+
+    if (!direccion || direccion.length < 5) {
+      Swal.fire("Dirección inválida", "Debe tener al menos 5 caracteres.", "warning");
+      return;
+    }
+
     try {
       if (adminActivo) {
         await updateAdministrador(adminActivo.id, formData);
@@ -38,6 +85,7 @@ export default function AdminAdministradores() {
     }
   };
 
+  // Elimina un administrador (si no es el principal)
   const eliminar = async (id, esPrincipal) => {
     if (esPrincipal) {
       Swal.fire("Advertencia", "No puedes eliminar al administrador principal.", "warning");
@@ -57,6 +105,7 @@ export default function AdminAdministradores() {
     }
   };
 
+  // Carga los administradores al montar el componente
   useEffect(() => {
     cargarAdmins();
   }, []);
@@ -64,9 +113,17 @@ export default function AdminAdministradores() {
   return (
     <div className="container mt-5">
       <h2>Administradores</h2>
+
       <button className="btn btn-primary mb-3" onClick={() => {
         setAdminActivo(null);
-        setFormData({ nombre: "", email: "", comuna: "", direccion: "", password: "" });
+        setFormData({
+          nombre: "",
+          email: "",
+          comuna: "",
+          direccion: "",
+          telefono: "",
+          password: ""
+        });
         setShowModal(true);
       }}>
         Nuevo Administrador
@@ -79,6 +136,7 @@ export default function AdminAdministradores() {
             <th>Email</th>
             <th>Comuna</th>
             <th>Dirección</th>
+            <th>Teléfono</th>
             <th>Principal</th>
             <th>Acciones</th>
           </tr>
@@ -90,6 +148,7 @@ export default function AdminAdministradores() {
               <td>{admin.email}</td>
               <td>{admin.comuna}</td>
               <td>{admin.direccion}</td>
+              <td>{admin.telefono}</td>
               <td>{admin.principal ? "✅" : "❌"}</td>
               <td>
                 <button
@@ -126,7 +185,9 @@ export default function AdminAdministradores() {
           <div className="modal-dialog">
             <div className="modal-content">
               <div className="modal-header">
-                <h5 className="modal-title">{adminActivo ? "Editar Administrador" : "Nuevo Administrador"}</h5>
+                <h5 className="modal-title">
+                  {adminActivo ? "Editar Administrador" : "Nuevo Administrador"}
+                </h5>
               </div>
               <div className="modal-body">
                 <input
@@ -134,24 +195,41 @@ export default function AdminAdministradores() {
                   placeholder="Nombre"
                   value={formData.nombre}
                   onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                  minLength={3}
+                  maxLength={50}
+                  required
                 />
                 <input
                   className="form-control mb-2"
                   placeholder="Email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  type="email"
+                  required
                 />
                 <input
                   className="form-control mb-2"
                   placeholder="Comuna"
                   value={formData.comuna}
                   onChange={(e) => setFormData({ ...formData, comuna: e.target.value })}
+                  required
                 />
                 <input
                   className="form-control mb-2"
                   placeholder="Dirección"
                   value={formData.direccion}
                   onChange={(e) => setFormData({ ...formData, direccion: e.target.value })}
+                  required
+                  minLength={5}
+                />
+                <input
+                  className="form-control mb-2"
+                  placeholder="Teléfono"
+                  value={formData.telefono}
+                  onChange={handleTelefonoChange}
+                  inputMode="numeric"
+                  minLength={8}
+                  maxLength={18}
                 />
                 {!adminActivo && (
                   <input
@@ -160,6 +238,8 @@ export default function AdminAdministradores() {
                     placeholder="Contraseña"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    minLength={6}
+                    required
                   />
                 )}
               </div>

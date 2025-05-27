@@ -11,6 +11,7 @@ import ProtectedByRole from './ProtectedByRole';
 import AdminLayout from '../components/admin/layout/AdminLayout';
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminAdministradores from "../pages/admin/AdminAdministradores";
+import AdminEmpresas from "../pages/admin/AdminEmpresas"
 
 export default function AppRouter() {
     return (

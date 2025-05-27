@@ -23,6 +23,9 @@ export default function NavAdmin() {
                         <li className="nav-item">
                             <Link className="nav-link" to="/admin/empresas">Empresas</Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className="nav-link" to="/admin/clientes">Clientes</Link>
+                        </li>
                     </ul>
                     <span className="navbar-text">
                         <CerrarSesion />
