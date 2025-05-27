@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-import { getClientes, addCliente, updateCliente, deleteCliente } from "../../services/clienteFirebase";
+import { getClientes, addCliente, updateCliente, deleteCliente } from "../../services/clienteFirebase.js"
 
 export default function AdminClientes() {
     const [clientes, setClientes] = useState([]);
