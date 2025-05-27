@@ -32,21 +32,61 @@ export default function AdminEmpresas() {
     setEmpresas(data);
   };
 
+  const validarRut = (rut) => {
+    rut = rut.replace(/[^0-9kK]/g, "");
+    if (rut.length < 8 || rut.length > 9) return false;
+
+    const cuerpo = rut.slice(0, -1);
+    const dv = rut.slice(-1).toUpperCase();
+
+    let suma = 0;
+    let multiplicador = 2;
+
+    for (let i = cuerpo.length - 1; i >= 0; i--) {
+      suma += parseInt(cuerpo[i]) * multiplicador;
+      multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
+    }
+
+    const dvEsperado = 11 - (suma % 11);
+    let dvCalculado = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
+
+    return dv === dvCalculado;
+  };
+
+  const formatearRut = (rut) => {
+    rut = rut.replace(/[^0-9kK]/g, "").toUpperCase();
+    if (rut.length <= 1) return rut;
+
+    let cuerpo = rut.slice(0, -1);
+    let dv = rut.slice(-1);
+    cuerpo = cuerpo.replace(/^0+/, "");
+
+    let formatted = "";
+    for (let i = cuerpo.length; i > 0; i -= 3) {
+      let start = Math.max(i - 3, 0);
+      let part = cuerpo.slice(start, i);
+      formatted = part + (formatted ? "." + formatted : "");
+    }
+
+    return `${formatted}-${dv}`;
+  };
+
   const validarDatos = () => {
     const errs = {};
     if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.nombre.trim())) {
       errs.nombre = "El nombre solo debe contener letras y espacios.";
     }
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.comuna.trim())) {
-      errs.comuna = "La comuna solo debe contener letras y espacios.";
+    if (!formData.comuna) {
+      errs.comuna = "Debe seleccionar una comuna.";
     }
-    if (
-      !/^(?:\+569\d{8}|9\d{8})$/.test(formData.telefono.trim())
-    ) {
-      errs.telefono = "Debe ser un número chileno válido (ej: +56912345678 o 912345678).";
+    if (!/^\+56\s9\s\d{4}\s\d{4}$/.test(formData.telefono.trim())) {
+      errs.telefono = "Debe ser un número chileno válido (ej: +56 9 1234 5678).";
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
       errs.email = "Correo electrónico no válido.";
+    }
+    if (!validarRut(formData.rut.trim())) {
+      errs.rut = "RUT no válido.";
     }
     return errs;
   };
@@ -116,10 +156,7 @@ export default function AdminEmpresas() {
 
       <button
         className="btn me-2"
-        style={{
-          backgroundColor: "#cc7000",
-          color: "#ffffff",
-        }}
+        style={{ backgroundColor: "#cc7000", color: "#ffffff" }}
         onClick={() => {
           setProductoData({ nombre: "", producto: "" });
           setErroresProducto({});
@@ -204,9 +241,12 @@ export default function AdminEmpresas() {
                   maxLength={12}
                   value={formData.rut}
                   onChange={(e) =>
-                    setFormData({ ...formData, rut: e.target.value })
+                    setFormData({ ...formData, rut: formatearRut(e.target.value) })
                   }
                 />
+                {errores.rut && (
+                  <div className="text-danger mb-2">{errores.rut}</div>
+                )}
                 <input
                   className="form-control mb-2"
                   placeholder="Dirección"
@@ -216,15 +256,20 @@ export default function AdminEmpresas() {
                     setFormData({ ...formData, direccion: e.target.value })
                   }
                 />
-                <input
+                <select
                   className="form-control mb-2"
-                  placeholder="Comuna"
-                  maxLength={50}
                   value={formData.comuna}
                   onChange={(e) =>
                     setFormData({ ...formData, comuna: e.target.value })
                   }
-                />
+                >
+                  <option value="">Seleccione</option>
+                  <option value="La Serena">La Serena</option>
+                  <option value="Vicuña">Vicuña</option>
+                  <option value="Ovalle">Ovalle</option>
+                  <option value="Coquimbo">Coquimbo</option>
+                  <option value="Santiago">Santiago</option>
+                </select>
                 {errores.comuna && (
                   <div className="text-danger mb-2">{errores.comuna}</div>
                 )}
@@ -243,11 +288,19 @@ export default function AdminEmpresas() {
                 <input
                   className="form-control mb-2"
                   placeholder="Teléfono"
-                  maxLength={12}
+                  maxLength={17}
                   value={formData.telefono}
-                  onChange={(e) =>
-                    setFormData({ ...formData, telefono: e.target.value })
-                  }
+                  onChange={(e) => {
+                    let input = e.target.value.replace(/\D/g, "");
+                    if (input.startsWith("56")) input = input.slice(2);
+                    if (input.length > 9) input = input.slice(0, 9);
+                    if (input.length === 0) {
+                      setFormData({ ...formData, telefono: "" });
+                    } else {
+                      const formatted = `+56 9 ${input.slice(1, 5)} ${input.slice(5, 9)}`.trim();
+                      setFormData({ ...formData, telefono: formatted });
+                    }
+                  }}
                 />
                 {errores.telefono && (
                   <div className="text-danger mb-2">{errores.telefono}</div>
@@ -316,7 +369,6 @@ export default function AdminEmpresas() {
                       return;
                     }
                     setErroresProducto({});
-                    // No hace nada más por ahora
                   }}
                 >
                   Asociar
