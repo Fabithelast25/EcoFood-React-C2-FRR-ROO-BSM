@@ -73,6 +73,8 @@ export default function AdminEmpresas() {
 
   const validarDatos = () => {
     const errs = {};
+    const emailTrimmed = formData.email.trim().toLowerCase();
+
     if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.nombre.trim())) {
       errs.nombre = "El nombre solo debe contener letras y espacios.";
     }
@@ -82,8 +84,15 @@ export default function AdminEmpresas() {
     if (!/^\+56\s9\s\d{4}\s\d{4}$/.test(formData.telefono.trim())) {
       errs.telefono = "Debe ser un número chileno válido (ej: +56 9 1234 5678).";
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
       errs.email = "Correo electrónico no válido.";
+    } else {
+      const emailExistente = empresas.find(
+        (e) => e.email.trim().toLowerCase() === emailTrimmed && (!empresaActiva || e.id !== empresaActiva.id)
+      );
+      if (emailExistente) {
+        errs.email = "Este correo ya está asociado a otra empresa.";
+      }
     }
     if (!validarRut(formData.rut.trim())) {
       errs.rut = "RUT no válido.";
