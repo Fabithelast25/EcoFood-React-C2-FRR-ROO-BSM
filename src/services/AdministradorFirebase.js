@@ -17,6 +17,7 @@ export const registrarAdministradorConAuth = async (datos) => {
       direccion: datos.direccion || "",
       tipo: "admin",
       email: datos.email || "",
+      telefono: datos.telefono || "",
       principal: false
     });
     await secondaryAuth.signOut();

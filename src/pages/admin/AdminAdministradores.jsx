@@ -20,58 +20,58 @@ export default function AdminAdministradores() {
     password: ""
   });
 
+  const [errores, setErrores] = useState({});
 
   const cargarAdmins = async () => {
     const data = await getAdministradores();
     setAdmins(data);
   };
 
-  const validarPassword = (pass) => {
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}$/;
-    return regex.test(pass);
+const validarDatos = () => {
+    const errs = {};
+    const emailTrimmed = formData.email.trim().toLowerCase();
+
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.nombre.trim())) {
+      errs.nombre = "El nombre solo debe contener letras y espacios.";
+    }
+    if (!formData.direccion.trim()) {
+      errs.direccion = "La dirección no puede estar vacía.";
+    }
+    if (!formData.comuna) {
+      errs.comuna = "Debe seleccionar una comuna.";
+    }
+    if (!/^\+56\s9\s\d{4}\s\d{4}$/.test(formData.telefono.trim())) {
+      errs.telefono = "Debe ser un número chileno válido (ej: +56 9 1234 5678).";
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
+      errs.email = "Correo electrónico no válido.";
+    } else {
+      const emailExistente = admins.find(
+        (e) => e.email.trim().toLowerCase() === emailTrimmed && (!adminActivo || e.id !== adminActivo.id)
+      );
+      if (emailExistente) {
+        errs.email = "Este correo ya está asociado a otro administrador.";
+      }
+      const password = formData.password.trim();
+      if (password.length < 8 || password.length > 20) {
+        errs.password = "La contraseña debe tener entre 8 y 20 caracteres.";
+      } else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+        errs.password = "La contraseña debe incluir letras y números.";
+      }
+      else if (!formData.password.trim()) {
+          errs.password = "La contraseña no puede estar vacía"
+        }
+    }
+    return errs;
   };
 
-  const formatearTelefono = (valor) => {
-    const numeros = valor.replace(/\D/g, "").slice(0, 11);
-    if (numeros.length >= 11) {
-      return `+56 ${numeros[2]} ${numeros.slice(3, 7)} ${numeros.slice(7, 11)}`;
-    }
-    return valor;
-  };
-
-  const handleTelefonoChange = (e) => {
-    const input = e.target.value;
-    const numeros = input.replace(/\D/g, "");
-    setFormData({ ...formData, telefono: formatearTelefono(numeros) });
-  };
-const guardar = async () => {
-    const { nombre, email, password, telefono, comuna, direccion } = formData;
-
-    if (!nombre || nombre.length < 3) {
-      Swal.fire("Nombre inválido", "Debe tener al menos 3 caracteres.", "warning");
+  const guardar = async () => {
+    const erroresVal = validarDatos();
+    if (Object.keys(erroresVal).length > 0) {
+      setErrores(erroresVal);
       return;
     }
-
-    if (!email.includes("@") || email.length < 6) {
-      Swal.fire("Correo inválido", "Introduce un correo electrónico válido.", "warning");
-      return;
-    }
-
-    if (!adminActivo && !validarPassword(password)) {
-      Swal.fire("Contraseña inválida", "Debe tener al menos 6 caracteres, incluyendo letras y números.", "warning");
-      return;
-    }
-
-    if (telefono && telefono.replace(/\D/g, "").length !== 11) {
-      Swal.fire("Teléfono inválido", "Debe contener exactamente 11 dígitos (Ej: +56 9 1234 5678)", "warning");
-      return;
-    }
-
-    if (!direccion || direccion.length < 5) {
-      Swal.fire("Dirección inválida", "Debe tener al menos 5 caracteres.", "warning");
-      return;
-    }
-
+    setErrores({});
     try {
       if (adminActivo) {
         await updateAdministrador(adminActivo.id, formData);
@@ -85,7 +85,6 @@ const guardar = async () => {
     }
   };
 
-  // Elimina un administrador (si no es el principal)
   const eliminar = async (id, esPrincipal) => {
     if (esPrincipal) {
       Swal.fire("Advertencia", "No puedes eliminar al administrador principal.", "warning");
@@ -105,7 +104,6 @@ const guardar = async () => {
     }
   };
 
-  // Carga los administradores al montar el componente
   useEffect(() => {
     cargarAdmins();
   }, []);
@@ -174,7 +172,7 @@ const guardar = async () => {
           ))}
           {admins.length === 0 && (
             <tr>
-              <td colSpan="6" className="text-center">No hay administradores registrados.</td>
+              <td colSpan="7" className="text-center">No hay administradores registrados.</td>
             </tr>
           )}
         </tbody>
@@ -199,49 +197,85 @@ const guardar = async () => {
                   maxLength={50}
                   required
                 />
+                {errores.nombre &&(
+                   <div className="text-danger mb-2">{errores.nombre}</div>
+                )}
                 <input
                   className="form-control mb-2"
                   placeholder="Email"
+                  maxLength={50}
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  type="email"
-                  required
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                 />
-                <input
-                  className="form-control mb-2"
-                  placeholder="Comuna"
-                  value={formData.comuna}
-                  onChange={(e) => setFormData({ ...formData, comuna: e.target.value })}
-                  required
-                />
+                {errores.email && (
+                  <div className="text-danger mb-2">{errores.email}</div>
+                )}
                 <input
                   className="form-control mb-2"
                   placeholder="Dirección"
+                  minLength={5}
+                  maxLength={50}
                   value={formData.direccion}
                   onChange={(e) => setFormData({ ...formData, direccion: e.target.value })}
                   required
-                  minLength={5}
                 />
+                {errores.direccion && (
+                  <div className="text-danger mb-2">{errores.direccion}</div>
+                )}
+                <select
+                  className="form-control mb-2"
+                  value={formData.comuna}
+                  onChange={(e) =>
+                    setFormData({ ...formData, comuna: e.target.value })
+                  }
+                >
+                  <option value="">Seleccione</option>
+                  <option value="La Serena">La Serena</option>
+                  <option value="Vicuña">Vicuña</option>
+                  <option value="Ovalle">Ovalle</option>
+                  <option value="Coquimbo">Coquimbo</option>
+                  <option value="Santiago">Santiago</option>
+                </select>
+                {errores.comuna && (
+                  <div className="text-danger mb-2">{errores.comuna}</div>
+                )}
                 <input
                   className="form-control mb-2"
                   placeholder="Teléfono"
+                  maxLength={17}
                   value={formData.telefono}
-                  onChange={handleTelefonoChange}
-                  inputMode="numeric"
-                  minLength={8}
-                  maxLength={18}
+                  onChange={(e) => {
+                    let input = e.target.value.replace(/\D/g, "");
+                    if (input.startsWith("56")) input = input.slice(2);
+                    if (input.length > 9) input = input.slice(0, 9);
+                    if (input.length === 0) {
+                      setFormData({ ...formData, telefono: "" });
+                    } else {
+                      const formatted = `+56 9 ${input.slice(1, 5)} ${input.slice(5, 9)}`.trim();
+                      setFormData({ ...formData, telefono: formatted });
+                    }
+                  }}
                 />
-                {!adminActivo && (
-                  <input
-                    type="password"
-                    className="form-control mb-2"
-                    placeholder="Contraseña"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    minLength={6}
-                    required
-                  />
+                {errores.telefono && (
+                  <div className="text-danger mb-2">{errores.telefono}</div>
                 )}
+                {!adminActivo && (
+                <input
+                  type="password"
+                  className="form-control mb-2"
+                  placeholder="Contraseña"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  minLength={6}
+                  maxLength={20}
+                  required
+                />
+              )}
+              {errores.password && (
+                <div className="text-danger mb-2">{errores.password}</div>
+              )}
               </div>
               <div className="modal-footer">
                 <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
