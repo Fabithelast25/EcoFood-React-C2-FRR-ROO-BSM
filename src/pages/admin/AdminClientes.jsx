@@ -12,7 +12,6 @@ export default function AdminClientes() {
         comuna: "",
         password: ""
     });
-
     const [errores, setErrores] = useState({});
 
     const cargarClientes = async () => {
@@ -21,66 +20,62 @@ export default function AdminClientes() {
     };
 
 const validarDatos = () => {
-    const errs = {};
-    const emailTrimmed = formData.email.trim().toLowerCase();
+        const errs = {};
+        const emailTrimmed = formData.email.trim().toLowerCase();
 
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.nombre.trim())) {
-      errs.nombre = "El nombre solo debe contener letras y espacios.";
-    }
-
-    if (!formData.comuna) {
-      errs.comuna = "Debe seleccionar una comuna.";
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
-      errs.email = "Correo electrónico no válido.";
-    } else {
-      const emailExistente = clientes.find(
-        (e) => e.email.trim().toLowerCase() === emailTrimmed && (!adminActivo || e.id !== adminActivo.id)
-      );
-      if (emailExistente) {
-        errs.email = "Este correo ya está asociado a otro usuario.";
-      }
-      const password = formData.password.trim();
-      if (password.length < 8 || password.length > 20) {
-        errs.password = "La contraseña debe tener entre 8 y 20 caracteres.";
-      } else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
-        errs.password = "La contraseña debe incluir letras y números.";
-      }
-      else if (!formData.password.trim()) {
-          errs.password = "La contraseña no puede estar vacía"
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.nombre.trim())) {
+            errs.nombre = "El nombre solo debe contener letras y espacios.";
         }
-    }
-    return errs;
-};
+
+        if (!formData.comuna) {
+            errs.comuna = "Debe seleccionar una comuna.";
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
+            errs.email = "Correo electrónico no válido.";
+        } else {
+            const emailExistente = clientes.find(
+                (e) => e.email.trim().toLowerCase() === emailTrimmed && (!clienteActivo || e.id !== clienteActivo.id)
+            );
+            if (emailExistente) {
+                errs.email = "Este correo ya está asociado a otro usuario.";
+            }
+        }
+
+
+        const password = formData.password.trim();
+        if (password.length < 8 || password.length > 20) {
+            errs.password = "La contraseña debe tener entre 8 y 20 caracteres.";
+        } else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+            errs.password = "La contraseña debe incluir letras y números.";
+        } else if (!password) {
+            errs.password = "La contraseña no puede estar vacía";
+        }
+
+        return errs;
+    };
 
     const guardar = async () => {
-      const erroresVal = validarDatos();
-      if (Object.keys(erroresVal).length > 0) {
-        setErrores(erroresVal);
-        return;
-      }
-      setErrores({});
-      try {
-        if (adminActivo) {
-            await updateAdministrador(adminActivo.id, formData);
-        } else {
-            await registrarAdministradorConAuth(formData);
+        const erroresVal = validarDatos();
+        if (Object.keys(erroresVal).length > 0) {
+            setErrores(erroresVal);
+            return;
         }
-
-        if (clienteActivo) {
-            await updateCliente(clienteActivo.id, formData);
-        } else {
-            await addCliente(formData);
+        setErrores({});
+        try {
+            if (clienteActivo) {
+                await updateCliente(clienteActivo.id, formData);
+            } else {
+                await addCliente(formData);
+            }
+            setShowModal(false);
+            cargarClientes();
+        } catch (error) {
+            Swal.fire("Error", error.message, "error");
         }
-        setShowModal(false);
-        cargarClientes();
-    } catch (error) {
-        Swal.fire("Error", error.message, "error");
-    }
-};
+    };
 
 
-    const eliminar = async (idn, esPrincipal) => {
+    const eliminar = async (id, esPrincipal) => {
         if (esPrincipal) {
             Swal.fire("Advertencia", "No puedes eliminar al administrador principal.", "warning");
             return;
@@ -143,7 +138,7 @@ const validarDatos = () => {
                                 </button>
                                 <button
                                     className="btn btn-danger btn-sm"
-                                    onClick={() => eliminar(c.id)}
+                                    onClick={() => eliminar(c.id,)}
                                 >
                                     Eliminar
                                 </button>
@@ -152,6 +147,7 @@ const validarDatos = () => {
                     ))}
                 </tbody>
             </table>
+
             {showModal && (
                 <div className="modal d-block" tabIndex="-1">
                     <div className="modal-dialog">
@@ -169,7 +165,13 @@ const validarDatos = () => {
                                     onChange={(e) =>
                                         setFormData({ ...formData, nombre: e.target.value })
                                     }
+                                    minLength={3}
+                                    maxLength={50}
+                                    required 
                                 />
+                                {errores.nombre && (
+                                    <div className="text-danger mb-2">{errores.nombre}</div>
+                                )}
                                 <input
                                     className="form-control mb-2"
                                     placeholder="Email"
@@ -178,6 +180,9 @@ const validarDatos = () => {
                                         setFormData({ ...formData, email: e.target.value })
                                     }
                                 />
+                                {errores.email && (
+                                    <div className="text-danger mb-2">{errores.email}</div>
+                                )}  
                                 <select
                                     className="form-control mb-2"
                                     value={formData.comuna}
@@ -192,7 +197,11 @@ const validarDatos = () => {
                                     <option value="Coquimbo">Coquimbo</option>
                                     <option value="Santiago">Santiago</option>
                                 </select>
-                                <input type="password"
+                                {errores.comuna && (
+                                    <div className="text-danger mb-2">{errores.comuna}</div>
+                                )}
+                                <input 
+                                    type="password"
                                     className="form-control mb-2"
                                     placeholder="Contraseña"
                                     value={formData.password}
@@ -201,11 +210,17 @@ const validarDatos = () => {
                                     maxLength={50}
                                     required
                                 />
+                            {errores.password && (
+                                <div className="text-danger mb-2">{errores.password}</div>
+                            )}
                             </div>
                             <div className="modal-footer">
                                 <button
                                     className="btn btn-secondary"
-                                    onClick={() => setShowModal(false)}
+                                    onClick={() => {
+                                        setShowModal(false)
+                                        setErrores({});
+                                    }}
                                 >
                                     Cancelar
                                 </button>
