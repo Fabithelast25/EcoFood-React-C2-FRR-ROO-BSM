@@ -6,42 +6,66 @@ export default function AdminClientes() {
     const [clientes, setClientes] = useState([]);
     const [clienteActivo, setClienteActivo] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const [formData, setFormData] = useState({ nombre: "", email: "", comuna: "" });
+    const [formData, setFormData] = useState({
+        nombre: "",
+        email: "",
+        comuna: "",
+        password: ""
+    });
+
+    const [errores, setErrores] = useState({});
 
     const cargarClientes = async () => {
         const data = await getClientes();
         setClientes(data);
     };
 
-    const validarPassword = (pass) => {
-    const regex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]{6,}$/;
-    return regex.test(pass);
-  };
+const validarDatos = () => {
+    const errs = {};
+    const emailTrimmed = formData.email.trim().toLowerCase();
 
+    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(formData.nombre.trim())) {
+      errs.nombre = "El nombre solo debe contener letras y espacios.";
+    }
+
+    if (!formData.comuna) {
+      errs.comuna = "Debe seleccionar una comuna.";
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed)) {
+      errs.email = "Correo electrónico no válido.";
+    } else {
+      const emailExistente = clientes.find(
+        (e) => e.email.trim().toLowerCase() === emailTrimmed && (!adminActivo || e.id !== adminActivo.id)
+      );
+      if (emailExistente) {
+        errs.email = "Este correo ya está asociado a otro usuario.";
+      }
+      const password = formData.password.trim();
+      if (password.length < 8 || password.length > 20) {
+        errs.password = "La contraseña debe tener entre 8 y 20 caracteres.";
+      } else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+        errs.password = "La contraseña debe incluir letras y números.";
+      }
+      else if (!formData.password.trim()) {
+          errs.password = "La contraseña no puede estar vacía"
+        }
+    }
+    return errs;
+};
 
     const guardar = async () => {
-        const { nombre, email, password, Comuna,  } = formData;
-
-        if (!nombre || nombre.length < 3) {
-        Swal.fire("Nombre inválido", "Debe tener al menos 3 caracteres.", "warning");
+      const erroresVal = validarDatos();
+      if (Object.keys(erroresVal).length > 0) {
+        setErrores(erroresVal);
         return;
+      }
+      setErrores({});
+      try {
+        if (adminActivo) {
+            await updateAdministrador(adminActivo.id, formData);
+        } else {
+            await registrarAdministradorConAuth(formData);
         }
-
-        if (!email.includes("@") || email.length < 6) {
-        Swal.fire("Correo inválido", "Introduce un correo electrónico válido.", "warning");
-        return;
-        }
-
-        if ( !validarPassword(password)) {
-        Swal.fire("Contraseña inválida", "Debe tener al menos 6 caracteres, incluyendo letras y números.", "warning");
-        return;
-        }
-
-        if ( Comuna && Comuna.replace(/\D/g, "").length !== 11) {
-        Swal.fire("comuna inválida", "Seleccione una");
-        return;
-        }
-
 
         if (clienteActivo) {
             await updateCliente(clienteActivo.id, formData);
@@ -50,9 +74,19 @@ export default function AdminClientes() {
         }
         setShowModal(false);
         cargarClientes();
-    };
+    } catch (error) {
+        Swal.fire("Error", error.message, "error");
+    }
+};
 
-    const eliminar = async (id) => {
+
+    const eliminar = async (idn, esPrincipal) => {
+        if (esPrincipal) {
+            Swal.fire("Advertencia", "No puedes eliminar al administrador principal.", "warning");
+            return;
+        }
+
+
         const result = await Swal.fire({
             title: "¿Eliminar cliente?",
             icon: "warning",
@@ -146,7 +180,6 @@ export default function AdminClientes() {
                                 />
                                 <select
                                     className="form-control mb-2"
-                                    placeholder="Seleccione Comuna"
                                     value={formData.comuna}
                                     onChange={(e) =>
                                         setFormData({ ...formData, comuna: e.target.value })
@@ -159,15 +192,14 @@ export default function AdminClientes() {
                                     <option value="Coquimbo">Coquimbo</option>
                                     <option value="Santiago">Santiago</option>
                                 </select>
-                                <input type="password" 
-                                className="form-control mb-2" 
-                                placeholder="Contraseña"
-                                value={formData.password} 
-                                onChange={(e) => setFormData({ ...formData, password:e.target.value })} 
-                                minLength={6}
-                                maxLength={50}
-                                required
-                                
+                                <input type="password"
+                                    className="form-control mb-2"
+                                    placeholder="Contraseña"
+                                    value={formData.password}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    minLength={6}
+                                    maxLength={50}
+                                    required
                                 />
                             </div>
                             <div className="modal-footer">
