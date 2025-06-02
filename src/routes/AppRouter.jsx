@@ -14,6 +14,10 @@ import AdminAdministradores from "../pages/admin/AdminAdministradores";
 import AdminClientes from "../pages/admin/AdminClientes";
 import AdminEmpresas from "../pages/admin/AdminEmpresas"
 
+//Empresa
+import EmpresaLayout from "../components/empresa/layout/EmpresaLayout";
+import EmpresaDashboard from "../pages/empresa/EmpresaDashboard";
+
 export default function AppRouter() {
     return (
         <Routes>
@@ -37,6 +41,14 @@ export default function AppRouter() {
                 <Route path="administradores" element={<AdminAdministradores/>} />
                 <Route path="empresas" element={<AdminEmpresas/>} />
                 <Route path="clientes" element={<AdminClientes/>} />
+            </Route>
+
+            <Route path="/empresa" element={
+                <ProtectedByRole allowed={["empresa"]}>
+                    <EmpresaLayout/>
+                </ProtectedByRole>
+            }>
+                <Route path="dashboard" element={<EmpresaDashboard/>} />
             </Route>
         </Routes>
     );
