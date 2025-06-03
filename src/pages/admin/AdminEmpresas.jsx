@@ -12,6 +12,7 @@ export default function AdminEmpresas() {
   const [empresaActiva, setEmpresaActiva] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [showAsociarModal, setShowAsociarModal] = useState(false);
+  const [mostrarPassword, setMostrarPassword] = useState(false);
   const [formData, setFormData] = useState({
     nombre: "",
     rut: "",
@@ -19,6 +20,7 @@ export default function AdminEmpresas() {
     comuna: "",
     email: "",
     telefono: "",
+    password: "",
   });
   const [productoData, setProductoData] = useState({
     nombre: "",
@@ -35,39 +37,31 @@ export default function AdminEmpresas() {
   const validarRut = (rut) => {
     rut = rut.replace(/[^0-9kK]/g, "");
     if (rut.length < 8 || rut.length > 9) return false;
-
     const cuerpo = rut.slice(0, -1);
     const dv = rut.slice(-1).toUpperCase();
-
     let suma = 0;
     let multiplicador = 2;
-
     for (let i = cuerpo.length - 1; i >= 0; i--) {
       suma += parseInt(cuerpo[i]) * multiplicador;
       multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
     }
-
     const dvEsperado = 11 - (suma % 11);
     let dvCalculado = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
-
     return dv === dvCalculado;
   };
 
   const formatearRut = (rut) => {
     rut = rut.replace(/[^0-9kK]/g, "").toUpperCase();
     if (rut.length <= 1) return rut;
-
     let cuerpo = rut.slice(0, -1);
     let dv = rut.slice(-1);
     cuerpo = cuerpo.replace(/^0+/, "");
-
     let formatted = "";
     for (let i = cuerpo.length; i > 0; i -= 3) {
       let start = Math.max(i - 3, 0);
       let part = cuerpo.slice(start, i);
       formatted = part + (formatted ? "." + formatted : "");
     }
-
     return `${formatted}-${dv}`;
   };
 
@@ -97,6 +91,16 @@ export default function AdminEmpresas() {
     if (!validarRut(formData.rut.trim())) {
       errs.rut = "RUT no válido.";
     }
+
+    // Validación de contraseña
+    if (!empresaActiva || formData.password.trim() !== "") {
+      if (formData.password.length < 12) {
+        errs.password = "La contraseña debe tener al menos 12 caracteres.";
+      } else if (!/(?=.*[a-zA-Z])(?=.*\d)/.test(formData.password)) {
+        errs.password = "La contraseña debe incluir letras y números.";
+      }
+    }
+
     return errs;
   };
 
@@ -115,10 +119,16 @@ export default function AdminEmpresas() {
       return;
     }
     setErrores({});
+
+    const dataToSave = { ...formData };
+    if (empresaActiva && formData.password.trim() === "") {
+      delete dataToSave.password; // No actualizar contraseña si está vacía
+    }
+
     if (empresaActiva) {
-      await updateEmpresa(empresaActiva.id, formData);
+      await updateEmpresa(empresaActiva.id, dataToSave);
     } else {
-      await addEmpresa(formData);
+      await addEmpresa(dataToSave);
     }
     setShowModal(false);
     cargarEmpresas();
@@ -155,8 +165,10 @@ export default function AdminEmpresas() {
             comuna: "",
             email: "",
             telefono: "",
+            password: "",
           });
           setErrores({});
+          setMostrarPassword(false);
           setShowModal(true);
         }}
       >
@@ -201,8 +213,9 @@ export default function AdminEmpresas() {
                     className="btn btn-warning btn-sm me-2"
                     onClick={() => {
                       setEmpresaActiva(e);
-                      setFormData(e);
+                      setFormData({ ...e, password: "" });
                       setErrores({});
+                      setMostrarPassword(false);
                       setShowModal(true);
                     }}
                   >
@@ -290,9 +303,15 @@ export default function AdminEmpresas() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
+                  disabled={!!empresaActiva}
                 />
                 {errores.email && (
                   <div className="text-danger mb-2">{errores.email}</div>
+                )}
+                {empresaActiva && (
+                  <div className="form-text text-muted mb-2">
+                  El correo no se puede modificar una vez registrado.
+                  </div>
                 )}
                 <input
                   className="form-control mb-2"
@@ -313,6 +332,29 @@ export default function AdminEmpresas() {
                 />
                 {errores.telefono && (
                   <div className="text-danger mb-2">{errores.telefono}</div>
+                )}
+
+                <div className="input-group mb-2">
+                  <input
+                    type={mostrarPassword ? "text" : "password"}
+                    className="form-control"
+                    placeholder="Contraseña"
+                    maxLength={50}
+                    value={formData.password}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
+                  />
+                  <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={() => setMostrarPassword(!mostrarPassword)}
+                  >
+                    {mostrarPassword ? "Ocultar" : "Ver"}
+                  </button>
+                </div>
+                {errores.password && (
+                  <div className="text-danger mb-2">{errores.password}</div>
                 )}
               </div>
               <div className="modal-footer">
