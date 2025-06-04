@@ -63,7 +63,11 @@ const validarDatos = () => {
         setErrores({});
         try {
             if (clienteActivo) {
-                await updateCliente(clienteActivo.id, formData);
+                const datosActualizados = { ...formData };
+                if (!formData.password) {
+                    delete datosActualizados.password;
+                }
+                await updateCliente(clienteActivo.id, datosActualizados);
             } else {
                 await addCliente(formData);
             }
@@ -172,17 +176,22 @@ const validarDatos = () => {
                                 {errores.nombre && (
                                     <div className="text-danger mb-2">{errores.nombre}</div>
                                 )}
-                                <input
-                                    className="form-control mb-2"
-                                    placeholder="Email"
-                                    value={formData.email}
-                                    onChange={(e) =>
-                                        setFormData({ ...formData, email: e.target.value })
-                                    }
-                                />
-                                {errores.email && (
-                                    <div className="text-danger mb-2">{errores.email}</div>
-                                )}  
+                                {!clienteActivo && (
+                                    <>
+                                        <input
+                                            className="form-control mb-2"
+                                            placeholder="Email"
+                                            value={formData.email}
+                                            onChange={(e) =>
+                                                setFormData({ ...formData, email: e.target.value })
+                                            }
+                                            required
+                                        />
+                                        {errores.email && (
+                                            <div className="text-danger mb-2">{errores.email}</div>
+                                        )}
+                                    </>
+                                )}
                                 <select
                                     className="form-control mb-2"
                                     value={formData.comuna}
@@ -200,18 +209,17 @@ const validarDatos = () => {
                                 {errores.comuna && (
                                     <div className="text-danger mb-2">{errores.comuna}</div>
                                 )}
-                                <input 
+                                {!clienteActivo && (
+                                <input
                                     type="password"
                                     className="form-control mb-2"
                                     placeholder="Contraseña"
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                     minLength={6}
-                                    maxLength={50}
+                                    maxLength={20}
                                     required
                                 />
-                            {errores.password && (
-                                <div className="text-danger mb-2">{errores.password}</div>
                             )}
                             </div>
                             <div className="modal-footer">
