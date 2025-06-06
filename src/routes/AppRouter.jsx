@@ -17,6 +17,7 @@ import AdminEmpresas from "../pages/admin/AdminEmpresas"
 //Empresa
 import EmpresaLayout from "../components/empresa/layout/EmpresaLayout";
 import EmpresaDashboard from "../pages/empresa/EmpresaDashboard";
+import EmpresaPerfil from "../pages/empresa/PerfilEmpresa";
 
 export default function AppRouter() {
     return (
@@ -40,6 +41,7 @@ export default function AppRouter() {
                 <Route path="dashboard" element={<AdminDashboard/>} />
                 <Route path="administradores" element={<AdminAdministradores/>} />
                 <Route path="empresas" element={<AdminEmpresas/>} />
+                <Route path="empresas" element={<AdminEmpresas/>} />
                 <Route path="clientes" element={<AdminClientes/>} />
             </Route>
 
@@ -50,6 +52,12 @@ export default function AppRouter() {
             }>
                 <Route path="dashboard" element={<EmpresaDashboard/>} />
             </Route>
+            <Route path="/empresa/perfil" element={
+                <ProtectedByRole allowed={["empresa"]}>
+                    <EmpresaPerfil/>
+                </ProtectedByRole>
+            } />
         </Routes>
+
     );
 }
