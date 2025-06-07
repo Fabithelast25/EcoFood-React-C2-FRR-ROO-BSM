@@ -228,6 +228,9 @@ const validarDatos = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   readOnly={!!adminActivo}
                 />
+                {errores.nombre &&(
+                  <div className="text-danger mb-2">{errores.email}</div>
+                )}
                 <input
                   className="form-control mb-2"
                   placeholder="Dirección"
