@@ -36,7 +36,9 @@ export const getAdministradores = async () => {
 };
 
 export const updateAdministrador = async (id, nuevosDatos) => {
-  await updateDoc(doc(db, "usuarios", id), nuevosDatos);
+  const { email, ...datosSinEmail } = nuevosDatos;
+  
+  await updateDoc(doc(db, "usuarios", id), datosSinEmail);
 };
 
 export const deleteAdministrador = async (id) => {

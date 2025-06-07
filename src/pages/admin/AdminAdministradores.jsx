@@ -6,6 +6,7 @@ import {
   updateAdministrador,
   deleteAdministrador
 } from "../../services/AdministradorFirebase";
+import { getAuth } from "firebase/auth";
 
 export default function AdminAdministradores() {
   const [admins, setAdmins] = useState([]);
@@ -52,15 +53,16 @@ const validarDatos = () => {
       if (emailExistente) {
         errs.email = "Este correo ya está asociado a otro administrador.";
       }
-      const password = formData.password.trim();
-      if (password.length < 8 || password.length > 20) {
-        errs.password = "La contraseña debe tener entre 8 y 20 caracteres.";
-      } else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
-        errs.password = "La contraseña debe incluir letras y números.";
-      }
-      else if (!formData.password.trim()) {
-          errs.password = "La contraseña no puede estar vacía"
+      if (!adminActivo) {
+        const password = formData.password ? formData.password.trim() : "";
+        if (!password) {
+          errs.password = "La contraseña no puede estar vacía.";
+        } else if (password.length < 8 || password.length > 20) {
+          errs.password = "La contraseña debe tener entre 8 y 20 caracteres.";
+        } else if (!/(?=.*[A-Za-z])(?=.*\d)/.test(password)) {
+          errs.password = "La contraseña debe incluir letras y números.";
         }
+      }
     }
     return errs;
   };
@@ -74,7 +76,12 @@ const validarDatos = () => {
     setErrores({});
     try {
       if (adminActivo) {
-        await updateAdministrador(adminActivo.id, formData);
+        await updateAdministrador(adminActivo.id, {
+          nombre: formData.nombre,
+          comuna: formData.comuna,
+          direccion: formData.direccion,
+          telefono: formData.telefono,
+        });
       } else {
         await registrarAdministradorConAuth(formData);
       }
@@ -85,9 +92,16 @@ const validarDatos = () => {
     }
   };
 
-  const eliminar = async (id, esPrincipal) => {
+  const auth = getAuth();
+  const usuarioActual = auth.currentUser;
+  const eliminar = async (id, esPrincipal, email) => {
     if (esPrincipal) {
       Swal.fire("Advertencia", "No puedes eliminar al administrador principal.", "warning");
+      return;
+    }
+
+    if (usuarioActual && email === usuarioActual.email) {
+      Swal.fire("Advertencia", "No puedes eliminar tu propio usuario.", "warning");
       return;
     }
 
@@ -154,19 +168,25 @@ const validarDatos = () => {
                   disabled={admin.principal}
                   onClick={() => {
                     setAdminActivo(admin);
-                    setFormData(admin);
+                    setFormData({
+                      nombre: admin.nombre || "",
+                      email: admin.email || "",
+                      comuna: admin.comuna || "",
+                      direccion: admin.direccion || "",
+                      telefono: admin.telefono || "",
+                    });
                     setShowModal(true);
                   }}
                 >
                   Editar
                 </button>
                 <button
-                  className="btn btn-danger btn-sm"
-                  disabled={admin.principal}
-                  onClick={() => eliminar(admin.id, admin.principal)}
-                >
-                  Eliminar
-                </button>
+                className="btn btn-danger btn-sm"
+                disabled={admin.principal}
+                onClick={() => eliminar(admin.id, admin.principal, admin.email)}
+              >
+                Eliminar
+              </button>
               </td>
             </tr>
           ))}
@@ -201,17 +221,13 @@ const validarDatos = () => {
                    <div className="text-danger mb-2">{errores.nombre}</div>
                 )}
                 <input
-                  className="form-control mb-2"
+                  type="email"
                   placeholder="Email"
-                  maxLength={50}
+                  className="form-control mb-2"
                   value={formData.email}
-                  onChange={(e) =>
-                    setFormData({ ...formData, email: e.target.value })
-                  }
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  readOnly={!!adminActivo}
                 />
-                {errores.email && (
-                  <div className="text-danger mb-2">{errores.email}</div>
-                )}
                 <input
                   className="form-control mb-2"
                   placeholder="Dirección"
