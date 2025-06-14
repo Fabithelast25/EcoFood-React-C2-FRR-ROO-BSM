@@ -17,6 +17,9 @@ export default function NavEmpresa() {
                         <li className="nav-item">
                             <Link className="nav-link" to="/empresa/dashboard">Dashboard</Link>
                         </li>
+                        <li>
+                            <Link className="nav-link" to="/empresa/producto">Producto</Link>
+                        </li>
                     </ul>
                     <span className="navbar-text">
                         <CerrarSesion />

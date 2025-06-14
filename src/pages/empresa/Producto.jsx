@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { useAuth } from "../../context/AuthContext";
 import Swal from "sweetalert2";
-import { deleteProducto } from "../../services/productoService";
+import { deleteProducto } from "../../services/productoFirebase";
 import TablaProductos from '../../components/empresa/TablaProductos';
 import ModalProductos from '../../components/empresa/ModalProductos';
 

@@ -13,6 +13,7 @@ export const AuthProvider = ({ children }) => {
                 setUser(firebaseUser);
                 try {
                     const data = await getUserData(firebaseUser.uid);
+                    data.uid = firebaseUser.uid;
                     setUserData(data);
                 } catch (error) {
                     console.error("Error cargando datos de Firestore:", error);
