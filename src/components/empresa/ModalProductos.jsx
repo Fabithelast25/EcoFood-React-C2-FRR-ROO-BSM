@@ -42,10 +42,16 @@ export default function AddProductos({
       errs.descripcion = "La descripción debe contener al menos 20 caracteres"
     }
 
-    const precio = parseInt(formData.precio);
-    if (isNaN(precio) || precio < 0) {
-      errs.precio = "El precio debe ser un número válido mayor o igual a 0";
+    if (!formData.precio || formData.precio.trim() === "") {
+    errs.precio = "Debe ingresar un precio válido.";
+  } else {
+    const precio = parseInt(formData.precio, 10);
+    if (isNaN(precio) || precio <= 0) {
+      errs.precio = "El precio debe ser un número mayor a 0.";
+    } else if (precio > 99999) {
+      errs.precio = "El precio no puede superar los $99.999";
     }
+  }
 
     if (precio > 99999) {
       errs.precio = "El precio no puede superar los $99.999";
@@ -53,7 +59,18 @@ export default function AddProductos({
 
     if (!formData.vencimiento) {
       errs.vencimiento = "Debe ingresar una fecha de vencimiento.";
+    } 
+    else {
+      const hoy = new Date();
+      const fechaMinima = new Date();
+      fechaMinima.setDate(hoy.getDate() + 3); // suma 3 días
+
+      const fechaIngresada = new Date(formData.vencimiento + "T00:00:00");
+
+    if (fechaIngresada < fechaMinima) {
+      errs.vencimiento = "La fecha debe ser al menos 3 días posterior a hoy.";
     }
+  }
 
     return errs
   }
