@@ -8,7 +8,7 @@ import ModalProductos from '../../components/empresa/ModalProductos';
 export default function Productos() {
   const { userData } = useAuth();
   const [busqueda, setBusqueda] = useState("");
-  const [refreshTick, setRefreshTick] = useState(0); // para refetch después de borrar
+  const [refreshTick, setRefreshTick] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     nombre: "",
@@ -17,6 +17,11 @@ export default function Productos() {
     vencimiento: "",
     id: null,
   });
+
+  // NUEVOS ESTADOS
+  const [estadoFiltro, setEstadoFiltro] = useState("todos");
+  const [orden, setOrden] = useState("nombre-asc");
+  const [porPagina, setPorPagina] = useState(10);
 
   const handleRefresh = () => {
     setRefreshTick((t) => t + 1);
@@ -36,7 +41,7 @@ export default function Productos() {
       }
     } catch (e) {
       console.error(e);
-      alert('Error al eliminar'); // manejo simple; mejora a tu gusto
+      alert('Error al eliminar');
     }
   }, []);
 
@@ -63,8 +68,51 @@ export default function Productos() {
             <h3>Gestión de Productos</h3>
           </div>
 
-          <div className="col"></div>
+          {/* FILTRO DE ESTADO */}
+          <div className="col-12 col-md-3">
+            <label className="form-label">Estado del producto</label>
+            <select
+              className="form-select"
+              value={estadoFiltro}
+              onChange={e => setEstadoFiltro(e.target.value)}
+            >
+              <option value="todos">Todos</option>
+              <option value="disponibles">Disponibles</option>
+              <option value="por-vencer">Por vencer</option>
+              <option value="vencidos">Vencidos</option>
+            </select>
+          </div>
 
+          {/* ORDENAMIENTO */}
+          <div className="col-12 col-md-3">
+            <label className="form-label">Ordenar por</label>
+            <select
+              className="form-select"
+              value={orden}
+              onChange={e => setOrden(e.target.value)}
+            >
+              <option value="nombre-asc">Nombre (A-Z)</option>
+              <option value="nombre-desc">Nombre (Z-A)</option>
+              <option value="precio-asc">Precio (menor a mayor)</option>
+              <option value="precio-desc">Precio (mayor a menor)</option>
+            </select>
+          </div>
+
+          {/* CANTIDAD POR PÁGINA */}
+          <div className="col-12 col-md-3">
+            <label className="form-label">Productos por página</label>
+            <select
+              className="form-select"
+              value={porPagina}
+              onChange={e => setPorPagina(Number(e.target.value))}
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+            </select>
+          </div>
+
+          <div className="col"></div>
           <div className="col-auto">
             <button className="btn btn-primary" onClick={() => abrirModal()}>
               Agregar Producto
@@ -91,8 +139,11 @@ export default function Productos() {
               key={refreshTick}
               busqueda={busqueda}
               userData={userData}
-              eliminar={(id) => eliminar(id)}
-              abrirModal={(p) => abrirModal(p)}
+              eliminar={eliminar}
+              abrirModal={abrirModal}
+              estadoFiltro={estadoFiltro}
+              orden={orden}
+              porPagina={porPagina}
             />
           </div>
         </div>
@@ -105,7 +156,7 @@ export default function Productos() {
         userData={userData}
         formData={formData}
         setFormData={setFormData}
-        abrirModal={(p) => abrirModal(p)}
+        abrirModal={abrirModal}
         handleRefresh={handleRefresh}
       />
     </>
