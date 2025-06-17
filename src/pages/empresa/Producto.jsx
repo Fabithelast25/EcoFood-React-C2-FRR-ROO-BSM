@@ -16,6 +16,8 @@ export default function Productos() {
     precio: 0,
     vencimiento: "",
     id: null,
+    cantidad: 0,
+    estado: "",
   });
 
   // NUEVOS ESTADOS
@@ -56,6 +58,8 @@ export default function Productos() {
         precio: 0,
         vencimiento: "",
         id: null,
+        cantidad: 0,
+        estado: "",
       });
     }
     setShowModal(true);
