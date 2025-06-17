@@ -96,6 +96,12 @@ export default function TablaProductos({
                   <strong>Vence:</strong> {p.vencimiento}
                 </div>
                 <div>
+                  <strong>Cantidad:</strong> {p.cantidad}
+                </div>
+                <div>
+                  <strong>Estado:</strong> {p.estado}
+                </div>
+                <div>
                   <button
                     className="btn btn-warning btn-sm me-2"
                     onClick={() => abrirModal(p)}

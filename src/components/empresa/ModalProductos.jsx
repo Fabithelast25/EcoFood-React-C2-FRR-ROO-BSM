@@ -19,6 +19,11 @@ export default function AddProductos({
     return soloNumeros;
   };
 
+  const validarCantidad = (cantidad) => {
+    const soloNumeros = cantidad.replace(/[^0-9]/g, "");
+    return soloNumeros;
+  };
+
   const validarDatos = () => {
     const errs = {};
 
@@ -42,15 +47,20 @@ export default function AddProductos({
       errs.descripcion = "La descripción debe contener al menos 20 caracteres"
     }
 
-    if (!formData.precio || formData.precio.trim() === "") {
-      errs.precio = "Debe ingresar un precio válido.";
-    } else {
-      const precio = parseInt(formData.precio, 10);
-      if (isNaN(precio) || precio <= 0) {
-        errs.precio = "El precio debe ser un número mayor a 0.";
-      } else if (precio > 99999) {
-        errs.precio = "El precio no puede superar los $99.999";
-      }
+    
+    const precio = parseInt(formData.precio, 10);
+    if (isNaN(precio) || precio < 0) {
+      errs.precio = "El precio debe ser un número mayor a 0.";
+    } else if (precio > 99999) {
+      errs.precio = "El precio no puede superar los $99.999";
+    }
+
+
+    const cantidad = parseInt(formData.cantidad, 10);
+    if (isNaN(cantidad) || cantidad < 0) {
+      errs.cantidad = "La cantidad debe ser un número mayor o igual a 0.";
+    } else if (cantidad > 100000) {
+      errs.cantidad = "La cantidad no puede superar las 100.000 unidades";
     }
 
     if (!formData.vencimiento) {
@@ -86,6 +96,13 @@ export default function AddProductos({
     }
 
     formData.precio = parseInt(formData.precio);
+
+    if (formData.cantidad === 0) {
+      formData.estado = "No disponible";
+    } else if (formData.cantidad > 0) {
+      formData.estado = "Disponible";
+    }
+
 
     if (formData.id) {
       await updateProducto(formData.id, formData);
@@ -162,6 +179,23 @@ export default function AddProductos({
           {errores.precio && (
             <div className="text-danger mb-2">
               {errores.precio}
+            </div>
+          )}
+
+          <label htmlFor="cantidad" className="form-label">Cantidad</label>
+          <input
+            id="cantidad"
+            type="text"
+            className="form-control mb-2"
+            maxLength={5}
+            value={formData.cantidad}
+            onChange={(e) =>
+              setFormData({ ...formData, cantidad: validarCantidad(e.target.value) })
+            }
+          />
+          {errores.cantidad && (
+            <div className="text-danger mb-2">
+              {errores.cantidad}
             </div>
           )}
 
