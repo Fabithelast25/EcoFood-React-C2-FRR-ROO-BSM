@@ -59,30 +59,45 @@ export const PAGE_SIZE = 5;
 export const getProductosByEmpresaPagina = async (
   empresaId,
   cursor = null,
-  nombre = ""
+  busqueda = "",
+  orden = "nombre-asc",
+  pageSize = 10,
+  estadoFiltro = "todos"
 ) => {
-  const ref = collection(db, "productos");
+  let [campo, dir] = orden.split("-");
+  if (!["nombre", "precio"].includes(campo)) campo = "nombre";
+  if (!["asc", "desc"].includes(dir)) dir = "asc";
+
+  let ref = collection(db, "productos");
+  let filtros = [where("empresaId", "==", empresaId)];
+
+  // Filtro de estado
+  const hoy = new Date().toISOString().slice(0, 10);
+  if (estadoFiltro === "disponibles") {
+    filtros.push(where("vencimiento", ">", hoy));
+  } else if (estadoFiltro === "por-vencer") {
+    const en7 = new Date();
+    en7.setDate(new Date().getDate() + 7);
+    const en7str = en7.toISOString().slice(0, 10);
+    filtros.push(where("vencimiento", ">", hoy));
+    filtros.push(where("vencimiento", "<=", en7str));
+  } else if (estadoFiltro === "vencidos") {
+    filtros.push(where("vencimiento", "<=", hoy));
+  }
+
+  // Filtro de búsqueda por nombre
+  if (busqueda) {
+    filtros.push(where("nombre", ">=", busqueda));
+    filtros.push(where("nombre", "<=", busqueda + "\uf8ff"));
+  }
 
   let q = query(
     ref,
-    where("empresaId", "==", empresaId),
-    orderBy("nombre"),
-    startAt(nombre),
-    endAt(nombre + "\uf8ff"),
-    limit(PAGE_SIZE)
+    ...filtros,
+    orderBy(campo, dir),
+    ...(cursor ? [startAfter(cursor)] : []),
+    limit(pageSize)
   );
-
-  if (cursor) {
-    q = query(
-      ref,
-      where("empresaId", "==", empresaId),
-      orderBy("nombre"),
-      startAt(nombre),
-      endAt(nombre + "\uf8ff"),
-      startAfter(cursor),
-      limit(PAGE_SIZE)
-    );
-  }
 
   const snapshot = await getDocs(q);
   const productos = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -91,4 +106,18 @@ export const getProductosByEmpresaPagina = async (
   return { productos, lastVisible };
 };
 
+// Verifica si hay al menos un producto vencido
+export const hayProductosVencidos = async (empresaId) => {
+  const hoy = new Date().toISOString().slice(0, 10);
+  const ref = collection(db, "productos");
 
+  const q = query(
+    ref,
+    where("empresaId", "==", empresaId),
+    where("vencimiento", "<=", hoy),
+    limit(1)
+  );
+
+  const snapshot = await getDocs(q);
+  return !snapshot.empty;
+};

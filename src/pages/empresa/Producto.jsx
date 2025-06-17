@@ -1,7 +1,7 @@
-import { useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { deleteProducto, hayProductosVencidos } from "../../services/productoFirebase";
 import { useAuth } from "../../context/AuthContext";
 import Swal from "sweetalert2";
-import { deleteProducto } from "../../services/productoFirebase";
 import TablaProductos from '../../components/empresa/TablaProductos';
 import ModalProductos from '../../components/empresa/ModalProductos';
 
@@ -22,6 +22,7 @@ export default function Productos() {
   const [estadoFiltro, setEstadoFiltro] = useState("todos");
   const [orden, setOrden] = useState("nombre-asc");
   const [porPagina, setPorPagina] = useState(10);
+  const [tieneVencidos, setTieneVencidos] = useState(false);
 
   const handleRefresh = () => {
     setRefreshTick((t) => t + 1);
@@ -60,12 +61,26 @@ export default function Productos() {
     setShowModal(true);
   };
 
+  useEffect(() => {
+    if (!userData?.uid) return;
+    const checkVencidos = async () => {
+      const hayVencidos = await hayProductosVencidos(userData.uid);
+      setTieneVencidos(hayVencidos);
+    };
+    checkVencidos();
+  }, [userData]);
+
   return (
     <>
       <div className="container mt-4">
         <div className="row g-4">
           <div className="col-12">
             <h3>Gestión de Productos</h3>
+            {tieneVencidos && (
+              <div className="alert alert-danger mt-3">
+                ¡Atención! Tienes productos vencidos.
+              </div>
+            )}
           </div>
 
           {/* FILTRO DE ESTADO */}
