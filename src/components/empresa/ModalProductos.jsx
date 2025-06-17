@@ -43,38 +43,22 @@ export default function AddProductos({
     }
 
     if (!formData.precio || formData.precio.trim() === "") {
-    errs.precio = "Debe ingresar un precio válido.";
-  } else {
-    const precio = parseInt(formData.precio, 10);
-    if (isNaN(precio) || precio <= 0) {
-      errs.precio = "El precio debe ser un número mayor a 0.";
-    } else if (precio > 99999) {
-      errs.precio = "El precio no puede superar los $99.999";
-    }
-  }
-
-    if (precio > 99999) {
-      errs.precio = "El precio no puede superar los $99.999";
+      errs.precio = "Debe ingresar un precio válido.";
+    } else {
+      const precio = parseInt(formData.precio, 10);
+      if (isNaN(precio) || precio <= 0) {
+        errs.precio = "El precio debe ser un número mayor a 0.";
+      } else if (precio > 99999) {
+        errs.precio = "El precio no puede superar los $99.999";
+      }
     }
 
     if (!formData.vencimiento) {
       errs.vencimiento = "Debe ingresar una fecha de vencimiento.";
-    } 
-    else {
-      const hoy = new Date();
-      const fechaMinima = new Date();
-      fechaMinima.setDate(hoy.getDate() + 3); // suma 3 días
-
-      const fechaIngresada = new Date(formData.vencimiento + "T00:00:00");
-
-    if (fechaIngresada < fechaMinima) {
-      errs.vencimiento = "La fecha debe ser al menos 3 días posterior a hoy.";
     }
-  }
 
-    return errs
+    return errs;
   }
-
 
   const guardarProducto = async (e) => {
     e.preventDefault();
@@ -85,6 +69,21 @@ export default function AddProductos({
     }
 
     setErrores({});
+
+    // Verificar si la fecha de vencimiento es dentro de los próximos 3 días
+    const hoy = new Date();
+    const fechaMinima = new Date();
+    fechaMinima.setDate(hoy.getDate() + 3);
+    const fechaIngresada = new Date(formData.vencimiento + "T00:00:00");
+
+    if (fechaIngresada < fechaMinima) {
+      await Swal.fire({
+        icon: 'warning',
+        title: 'Atención',
+        text: 'El producto vencerá en menos de 3 días.',
+        confirmButtonText: 'Aceptar',
+      });
+    }
 
     formData.precio = parseInt(formData.precio);
 
@@ -115,7 +114,7 @@ export default function AddProductos({
 
       <form onSubmit={guardarProducto}>
         <Modal.Body>
-          <label for="nombre" className="form-label">Nombre</label>
+          <label htmlFor="nombre" className="form-label">Nombre</label>
           <input
             id="nombre"
             className="form-control mb-2"
@@ -131,7 +130,8 @@ export default function AddProductos({
               {errores.nombre}
             </div>
           )}
-          <label for="descripcion" className="form-label">Descripción</label>
+
+          <label htmlFor="descripcion" className="form-label">Descripción</label>
           <textarea
             id="descripcion"
             className="form-control mb-2"
@@ -142,10 +142,13 @@ export default function AddProductos({
               setFormData({ ...formData, descripcion: e.target.value })
             }
           ></textarea>
-          <div className="text-danger mb-2">
+          {errores.descripcion && (
+            <div className="text-danger mb-2">
               {errores.descripcion}
-          </div>
-          <label for="precio" className="form-label">Precio</label>
+            </div>
+          )}
+
+          <label htmlFor="precio" className="form-label">Precio</label>
           <input
             id="precio"
             type="text"
@@ -161,7 +164,8 @@ export default function AddProductos({
               {errores.precio}
             </div>
           )}
-          <label for="fecha" className="form-label">Fecha Vencimiento</label>
+
+          <label htmlFor="fecha" className="form-label">Fecha Vencimiento</label>
           <input
             id="fecha"
             type="date"
@@ -184,7 +188,8 @@ export default function AddProductos({
             className="btn btn-secondary"
             onClick={() => {
               setErrores({})
-              setShow(false)}}
+              setShow(false)
+            }}
           >
             Cerrar
           </button>
@@ -196,3 +201,4 @@ export default function AddProductos({
     </Modal>
   );
 }
+
