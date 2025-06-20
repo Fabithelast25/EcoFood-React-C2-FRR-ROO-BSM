@@ -65,6 +65,15 @@ export default function AddProductos({
 
     if (!formData.vencimiento) {
       errs.vencimiento = "Debe ingresar una fecha de vencimiento.";
+    } else {
+      const hoy = new Date();
+      hoy.setHours(0, 0, 0, 0);
+      const fechaVencimiento = new Date(formData.vencimiento);
+      fechaVencimiento.setHours(0, 0, 0, 0);
+
+      if (fechaVencimiento < hoy) {
+        errs.vencimiento = "La fecha de vencimiento no puede ser anterior a hoy.";
+      }
     }
 
     return errs;
@@ -80,18 +89,20 @@ export default function AddProductos({
 
     setErrores({});
 
-    // Verificar si la fecha de vencimiento es dentro de los próximos 3 días
     const hoy = new Date();
-    const fechaMinima = new Date();
-    fechaMinima.setDate(hoy.getDate() + 3);
-    const fechaIngresada = new Date(formData.vencimiento + "T00:00:00");
+    hoy.setHours(0, 0, 0, 0);
+    const fechaVencimiento = new Date(formData.vencimiento);
+    fechaVencimiento.setHours(0, 0, 0, 0);
+    const diferenciaDias = (fechaVencimiento - hoy) / (1000 * 60 * 60 * 24);
 
-    if (fechaIngresada < fechaMinima) {
+    if (diferenciaDias <= 3) {
       await Swal.fire({
-        icon: 'warning',
-        title: 'Atención',
-        text: 'El producto vencerá en menos de 3 días.',
-        confirmButtonText: 'Aceptar',
+        icon: "warning",
+        title: "¡Advertencia!",
+        text: "El producto está por vencer en menos de 3 días.",
+        confirmButtonText: "Aceptar",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
       });
     }
 
