@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext"; // Ajusta la ruta según tu proyecto
 import { obtenerPedidosPorEmail } from "../../services/pedidoFirebase";
+import { useNavigate } from "react-router-dom";
 
 export default function PedidosCliente() {
   const { userData } = useAuth();
   const [pedidos, setPedidos] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!userData?.email) return;
@@ -21,6 +23,9 @@ export default function PedidosCliente() {
 
   return (
     <div className="container mt-4">
+      <button className="btn btn-primary mb-3" onClick={() => navigate("/cliente/HomeCliente")}>
+        Volver al inicio
+      </button>
       <h3>Mis Pedidos</h3>
       {pedidos.length === 0 ? (
         <p>No tienes pedidos aún.</p>
