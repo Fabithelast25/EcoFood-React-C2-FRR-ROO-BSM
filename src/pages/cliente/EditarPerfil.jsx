@@ -105,6 +105,7 @@ export default function PerfilCliente() {
           value={form.nombre}
           onChange={handleChange}
           disabled={!editando}
+          maxLength={50} 
         />
       </div>
 
@@ -131,6 +132,7 @@ export default function PerfilCliente() {
             value={form.comuna}
             readOnly
             disabled
+            maxLength={30} // 
           />
         )}
       </div>
@@ -144,6 +146,7 @@ export default function PerfilCliente() {
           value={form.direccion}
           onChange={handleChange}
           disabled={!editando}
+          maxLength={50} // 
         />
       </div>
 
@@ -156,6 +159,7 @@ export default function PerfilCliente() {
           value={form.telefono}
           readOnly
           disabled
+          maxLength={15} // 
         />
       </div>
 
@@ -179,4 +183,5 @@ export default function PerfilCliente() {
     </div>
   );
 }
+
 
