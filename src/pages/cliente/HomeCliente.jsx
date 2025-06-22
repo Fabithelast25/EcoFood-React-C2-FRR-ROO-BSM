@@ -1,9 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
-import CerrarSesion from "../components/CerrarSesion"; 
-import CardProducto from '../components/CardProducto';
+import { useAuth } from "../../context/AuthContext";
+import CerrarSesion from "../../components/CerrarSesion";
 
-export default function Home() {
+export default function HomeCliente() {
   const navigate = useNavigate();
   const { userData } = useAuth();
 
@@ -13,25 +12,24 @@ export default function Home() {
       <div className="d-flex flex-column align-items-center mt-4 gap-3">
         <button
           className="btn btn-primary"
-          onClick={() => navigate("/empresa/producto")}
+          onClick={() => navigate("/cliente/VerProductos")}
         >
-          Visualizar productos
+          Ver productos disponibles
         </button>
         <button
           className="btn btn-secondary"
-          onClick={() => navigate("/empresa/solicitudes")}
+          onClick={() => navigate("/cliente/MisPedidos")}
         >
-          Ver solicitudes realizadas
+          Ver mis solicitudes
         </button>
         <button
           className="btn btn-outline-info"
-          onClick={() => navigate("/empresa/perfil")}
+          onClick={() => navigate("/cliente/EditarPerfil")}
         >
           Editar perfil
         </button>
       </div>
-      <CardProducto nombre="Pan Integral" precio="$500" />
-      <CerrarSesion /> 
+      <CerrarSesion />
     </div>
   );
 }
