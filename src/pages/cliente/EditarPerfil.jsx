@@ -79,10 +79,6 @@ export default function PerfilCliente() {
 
   return (
     <div className="container mt-4">
-      <button className="btn btn-primary mb-3" onClick={() => navigate("/cliente/HomeCliente")}>
-        Volver al inicio
-      </button>
-
       <h2>Perfil del Cliente</h2>
 
       <div className="mb-3">

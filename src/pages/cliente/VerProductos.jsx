@@ -14,7 +14,7 @@ export default function VerProductos() {
         const snapshot = await getDocs(ref);
         const lista = snapshot.docs
           .map(doc => ({ ...doc.data(), id: doc.id }))
-          .filter(p => p.estado?.toLowerCase() === "activo" && p.cantidad > 0);
+          .filter(p => p.estado?.toLowerCase() === "disponible" && p.cantidad > 0);
 
         setProductos(lista);
       } catch (e) {

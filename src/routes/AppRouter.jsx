@@ -9,6 +9,7 @@ import NotFound from "../pages/NotFound"
 
 
 //Cliente
+import ClienteLayout from "../components/cliente/layout/ClienteLayout";
 import HomeCliente from "../pages/cliente/HomeCliente";
 import Productos from "../pages/cliente/VerProductos";
 import VerSolicitudes from "../pages/cliente/MisPedidos";
@@ -40,10 +41,17 @@ export default function AppRouter() {
                     <Home /> 
                 </ProtectedRoute> 
         }/>
-                <Route path="/cliente/HomeCliente" element={<HomeCliente />} />
-                <Route path="/cliente/VerProductos" element={<Productos />} />
-                <Route path="/cliente/MisPedidos" element={<VerSolicitudes />} />
-                <Route path="/cliente/EditarPerfil" element={<PerfilCliente />} />
+            <Route path="/cliente" element={
+                <ProtectedByRole allowed={["cliente"]}>
+                    <ClienteLayout/>
+                </ProtectedByRole>
+            }>
+                <Route path="HomeCliente" element={<HomeCliente />} />
+                <Route path="VerProductos" element={<Productos />} />
+                <Route path="MisPedidos" element={<VerSolicitudes />} />
+                <Route path="EditarPerfil" element={<PerfilCliente />} />
+            </Route>
+                
         
             <Route path="/admin" element={
                 <ProtectedByRole allowed={["admin"]}>

@@ -23,9 +23,6 @@ export default function PedidosCliente() {
 
   return (
     <div className="container mt-4">
-      <button className="btn btn-primary mb-3" onClick={() => navigate("/cliente/HomeCliente")}>
-        Volver al inicio
-      </button>
       <h3>Mis Pedidos</h3>
       {pedidos.length === 0 ? (
         <p>No tienes pedidos aún.</p>
