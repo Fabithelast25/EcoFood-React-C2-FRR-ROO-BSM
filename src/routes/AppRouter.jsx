@@ -26,7 +26,7 @@ import EmpresaLayout from "../components/empresa/layout/EmpresaLayout";
 import EmpresaDashboard from "../pages/empresa/EmpresaDashboard";
 import EmpresaPerfil from "../pages/empresa/PerfilEmpresa";
 import EmpresaProducto from "../pages/empresa/Producto"
-import VerProductos from "../pages/cliente/VerProductos";
+import EmpresaPedidos from "../pages/empresa/SolicitudesClientes";
 
 export default function AppRouter() {
     return (
@@ -73,6 +73,7 @@ export default function AppRouter() {
                 <Route path="dashboard" element={<EmpresaDashboard/>} />
                 <Route path="producto" element={<EmpresaProducto/>} />
                 <Route path="perfil" element={<EmpresaPerfil />} />
+                <Route path="pedidos" element={<EmpresaPedidos />} />
                 
             </Route>
         </Routes>

@@ -3,6 +3,7 @@ import {
   collection,
   setDoc,
   getDocs,
+  getDoc,
   updateDoc,
   query,
   where,
@@ -15,6 +16,7 @@ import {
   startAfter,
   getCountFromServer, // SDK v9+ → consulta agregada COUNT
 } from "firebase/firestore";
+import Swal from "sweetalert2";
 
 // Agregar producto con ID generado automáticamente
 export const addProducto = async (producto) => {
@@ -121,3 +123,44 @@ export const hayProductosVencidos = async (empresaId) => {
   const snapshot = await getDocs(q);
   return !snapshot.empty;
 };
+
+export async function obtenerProductoPorId(id) {
+  const ref = doc(db, "productos", id);
+  const snapshot = await getDoc(ref);
+  if (snapshot.exists()) {
+    return { id: snapshot.id, ...snapshot.data() };
+  } else {
+    return null;
+  }
+}
+
+export async function reducirStockProducto(productoId, cantidadARestar) {
+  const ref = doc(db, "productos", productoId);
+  const snapshot = await getDoc(ref);
+
+  if (!snapshot.exists()) {
+    await Swal.fire({
+      icon: "error",
+      title: "Producto no encontrado",
+      text: "El producto no se ha encontrado para reducir su stock"
+    }
+    )
+    throw new Error("Producto no encontrado");
+  }
+
+  const producto = snapshot.data();
+  const nuevaCantidad = producto.cantidad - cantidadARestar;
+
+  if (nuevaCantidad < 0) {
+      await Swal.fire({
+      icon: "error",
+      title: "Stock insuficiente",
+      text: "No hay suficiente stock para entregar este pedido.",
+    });
+    return; // ← IMPORTANTE: corta la función aquí
+  }
+
+  await updateDoc(ref, {
+    cantidad: nuevaCantidad,
+  });
+}
