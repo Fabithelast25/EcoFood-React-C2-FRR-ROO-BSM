@@ -23,6 +23,9 @@ export default function NavEmpresa() {
                         <li>
                             <Link className="nav-link" to="/empresa/perfil">Perfil</Link>
                         </li>
+                        <li>
+                            <Link className="nav-link" to="/empresa/pedidos">Pedidos Clientes</Link>
+                        </li>
                     </ul>
                     <span className="navbar-text">
                         <CerrarSesion />
