@@ -3,6 +3,8 @@ import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { crearPedido } from "../../services/pedidoFirebase"; // <-- IMPORTANTE
 import { useAuth } from "../../context/AuthContext"; // <-- IMPORTANTE
+import { obtenerEmpresaPorId } from "../../services/EmpresaFirebase";
+
 
 export default function VerProductos() {
   const [productos, setProductos] = useState([]);
@@ -48,14 +50,23 @@ export default function VerProductos() {
       return;
     }
 
+    // Obtener nombre de empresa
+    let empresaNombre = "Desconocida";
+    if (producto.empresaId) {
+      const empresa = await obtenerEmpresaPorId(producto.empresaId);
+      if (empresa?.nombre) {
+        empresaNombre = empresa.nombre;
+      }
+    }
+
     const pedido = {
       productoId: producto.id,
       productoNombre: producto.nombre,
       empresaId: producto.empresaId || "sin_id",
-      empresaNombre: producto.empresaNombre || "Desconocida",
-      cantidad: cantidadSolicitada,
+      empresaNombre: empresaNombre,
+      cantidadSolicitada,
       emailCliente: userData.email,
-      estado: "pendiente"
+      estado: "pendiente",
     };
 
     try {
@@ -66,6 +77,7 @@ export default function VerProductos() {
       alert("Ocurrió un error al registrar el pedido.");
     }
   };
+
 
   const filtrar = () => {
     return productos.filter((p) =>

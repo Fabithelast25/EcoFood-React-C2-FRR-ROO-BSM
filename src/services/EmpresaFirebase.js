@@ -1,5 +1,5 @@
 import { secondaryAuth, db } from "./firebase";
-import { setDoc, doc, getDocs, collection, updateDoc, deleteDoc } from "firebase/firestore";
+import { setDoc, doc, getDocs, getDoc, collection, updateDoc, deleteDoc } from "firebase/firestore";
 import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
 
 export const getEmpresas = async () => {
@@ -47,4 +47,19 @@ export const deleteEmpresa = async (id) => {
 };
 
 
- 
+export const obtenerEmpresaPorId = async (id) => {
+  try {
+    const ref = doc(db, "usuarios", id);
+    const snapshot = await getDoc(ref);
+
+    if (snapshot.exists()) {
+      return snapshot.data(); // contiene nombre, comuna, etc.
+    } else {
+      console.warn("Empresa no encontrada");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error al obtener empresa:", error);
+    return null;
+  }
+};
