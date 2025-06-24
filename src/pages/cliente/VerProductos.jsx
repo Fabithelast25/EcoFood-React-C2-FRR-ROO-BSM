@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../services/firebase";
+import { crearPedido } from "../../services/pedidoFirebase"; // <-- IMPORTANTE
+import { useAuth } from "../../context/AuthContext"; // <-- IMPORTANTE
 
 export default function VerProductos() {
   const [productos, setProductos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
   const [cantidades, setCantidades] = useState({});
+  const { userData } = useAuth(); // <-- OBTENER USUARIO
 
   useEffect(() => {
     const cargarProductos = async () => {
@@ -25,12 +28,6 @@ export default function VerProductos() {
     cargarProductos();
   }, []);
 
-  const filtrar = () => {
-    return productos.filter((p) =>
-      p.nombre.toLowerCase().includes(busqueda.toLowerCase())
-    );
-  };
-
   const manejarCantidad = (id, valor) => {
     const num = parseInt(valor);
     if (!isNaN(num)) {
@@ -38,7 +35,7 @@ export default function VerProductos() {
     }
   };
 
-  const solicitar = (producto) => {
+  const solicitar = async (producto) => {
     const cantidadSolicitada = cantidades[producto.id] || 1;
 
     if (cantidadSolicitada > producto.cantidad) {
@@ -46,13 +43,34 @@ export default function VerProductos() {
       return;
     }
 
-    console.log("Solicitud registrada:", {
-      productoId: producto.id,
-      nombre: producto.nombre,
-      cantidad: cantidadSolicitada,
-    });
+    if (!userData?.email) {
+      alert("Debes estar autenticado para realizar pedidos.");
+      return;
+    }
 
-    alert(`Solicitaste ${cantidadSolicitada} unidades de "${producto.nombre}"`);
+    const pedido = {
+      productoId: producto.id,
+      productoNombre: producto.nombre,
+      empresaId: producto.empresaId || "sin_id",
+      empresaNombre: producto.empresaNombre || "Desconocida",
+      cantidad: cantidadSolicitada,
+      emailCliente: userData.email,
+      estado: "pendiente"
+    };
+
+    try {
+      await crearPedido(pedido);
+      alert(`Solicitaste ${cantidadSolicitada} unidades de "${producto.nombre}"`);
+    } catch (error) {
+      console.error("Error al registrar el pedido:", error);
+      alert("Ocurrió un error al registrar el pedido.");
+    }
+  };
+
+  const filtrar = () => {
+    return productos.filter((p) =>
+      p.nombre.toLowerCase().includes(busqueda.toLowerCase())
+    );
   };
 
   return (
