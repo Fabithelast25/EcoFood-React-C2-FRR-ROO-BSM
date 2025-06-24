@@ -1,5 +1,6 @@
 import { db } from "./firebase"; // Ajusta la ruta si es diferente
-import { collection, getDocs, query, where, doc, updateDoc} from "firebase/firestore";
+import { collection, getDocs, query, where, doc, updateDoc, addDoc} from "firebase/firestore";
+
 
 export async function obtenerPedidosPorEmail(emailCliente) {
   try {
@@ -39,4 +40,13 @@ export async function actualizarEstadoPedido(pedidoId, nuevoEstado) {
   await updateDoc(ref, {
     estado: nuevoEstado,
   });
+}
+
+export async function crearPedido(pedido) {
+  try {
+    const pedidosRef = collection(db, "pedidos");
+    await addDoc(pedidosRef, { ...pedido, estado: "pendiente" });
+  } catch (error) {
+    console.error("Error al crear pedido:", error);
+  }
 }
