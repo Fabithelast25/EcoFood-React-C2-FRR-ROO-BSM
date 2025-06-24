@@ -50,3 +50,8 @@ export async function crearPedido(pedido) {
     console.error("Error al crear pedido:", error);
   }
 }
+
+export async function cancelarPedido(pedidoId) {
+  const pedidoRef = doc(db, "pedidos", pedidoId);
+  await updateDoc(pedidoRef, { estado: "cancelado" });
+}
