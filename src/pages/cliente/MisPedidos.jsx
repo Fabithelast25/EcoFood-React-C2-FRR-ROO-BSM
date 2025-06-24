@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext"; // Ajusta la ruta según tu proyecto
 import { obtenerPedidosPorEmail } from "../../services/pedidoFirebase";
 import { useNavigate } from "react-router-dom";
+import { cancelarPedido } from "../../services/pedidoFirebase";
 
 export default function PedidosCliente() {
   const { userData } = useAuth();
@@ -18,6 +19,20 @@ export default function PedidosCliente() {
 
     fetchPedidos();
   }, [userData]);
+
+  const handleCancelar = async (pedidoId) => {
+  try {
+    await cancelarPedido(pedidoId);
+    // Actualizar estado local para reflejar el cambio
+    setPedidos((prev) =>
+      prev.map((pedido) =>
+        pedido.id === pedidoId ? { ...pedido, estado: "cancelado" } : pedido
+      )
+    );
+  } catch (error) {
+    console.error("Error al cancelar el pedido:", error);
+  }
+};
 
   if (!userData) return <p>Cargando usuario...</p>;
 
@@ -44,7 +59,10 @@ export default function PedidosCliente() {
                 <td>{pedido.estado}</td>
                 <td>
                   {pedido.estado === "pendiente" ? (
-                    <button className="btn btn-danger btn-sm">
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleCancelar(pedido.id)}
+                    >
                       Cancelar
                     </button>
                   ) : (
