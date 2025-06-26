@@ -3,6 +3,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { AuthContext } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 export default function PerfilCliente() {
   const { user } = useContext(AuthContext);
@@ -58,22 +59,46 @@ export default function PerfilCliente() {
   };
 
   const handleGuardar = async () => {
+    // Limpiar los datos de espacios en blanco
+    const nombre = form.nombre.trim();
+    const comuna = form.comuna.trim();
+    const direccion = form.direccion.trim();
+
+    // Validación
+    if (!nombre || !comuna || !direccion) {
+      Swal.fire({
+        icon: "warning",
+        title: "Campos incompletos",
+        text: "Por favor completa todos los campos correctamente. No se permiten espacios en blanco.",
+      });
+      return;
+    }
+
     try {
       const ref = doc(db, "usuarios", user.uid);
       await updateDoc(ref, {
-        nombre: form.nombre,
-        comuna: form.comuna,
-        direccion: form.direccion,
-        // No se actualiza el teléfono
+        nombre,
+        comuna,
+        direccion,
       });
-      setCliente({ ...cliente, ...form });
+
+      setCliente({ ...cliente, nombre, comuna, direccion }); // usar los valores limpios
       setEditando(false);
-      alert("Perfil actualizado correctamente.");
+
+      Swal.fire({
+        icon: "success",
+        title: "Perfil actualizado",
+        text: "Tus datos han sido guardados correctamente.",
+      });
     } catch (error) {
       console.error("Error al actualizar:", error);
-      alert("Ocurrió un error al guardar.");
+      Swal.fire({
+        icon: "error",
+        title: "Error al guardar",
+        text: "Ocurrió un error al intentar guardar los datos.",
+      });
     }
-  };
+  }
 
   if (loading) return <p>Cargando perfil...</p>;
 
