@@ -1,0 +1,149 @@
+body {
+  background-image: url('../img/marco-vegetacion-verde-acuarela_53876-105303.avif');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 100vh;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+
+.login-form-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  background-color: #E7E7D7;
+  border-radius: 10px;
+  border: 1px solid black;
+  padding: 30px 40px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  box-sizing: border-box;
+}
+
+.login-form-container h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #CEC7A0;
+  padding-bottom: 10px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px 5px;
+  font-size: 16px;
+  border: none;
+  border-bottom: 2px solid #adadad;
+  background: none;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.input-group label {
+  position: absolute;
+  top: 50%;
+  left: 5px;
+  transform: translateY(-50%);
+  color: #adadad;
+  pointer-events: none;
+  transition: 0.3s;
+}
+
+.input-group input:focus + label,
+.input-group input:not(:placeholder-shown) + label {
+  top: -10px;
+  font-size: 14px;
+  color: black;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  background-color: #4E603A;
+  color: #E7E7D7;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background-color 0.3s;
+}
+
+.btn-login:hover {
+  background-color: #3b4b2c;
+}
+
+.recuperar-link {
+  display: block;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  color: blue;
+  cursor: pointer;
+  text-align: right;
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.recuperar-link:hover {
+  text-decoration: underline;
+}
+
+.crear-cuenta {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.crear-cuenta .btn-success {
+  background-color: #2e7d32;
+  width: 100%;
+  margin-top: 10px;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.crear-cuenta .btn-success:hover {
+  background-color: #1b5e20;
+}
+
+/* 🔽 Media queries para hacer el diseño responsive */
+@media (max-width: 768px) {
+  .login-form-container {
+    width: 90%;
+    padding: 25px 30px;
+  }
+
+  .btn-login,
+  .crear-cuenta .btn-success {
+    font-size: 14px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form-container {
+    padding: 20px;
+  }
+
+  .input-group input {
+    font-size: 14px;
+    padding: 8px 5px;
+  }
+
+  .btn-login,
+  .crear-cuenta .btn-success {
+    font-size: 13px;
+  }
+
+  .recuperar-link {
+    font-size: 13px;
+  }
+}
