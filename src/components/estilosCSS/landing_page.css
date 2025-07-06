@@ -1,0 +1,65 @@
+#background {
+    background-color: #EBEDE6
+}
+
+/* Diseño de la barra de navegación */
+
+.navbar {
+    background-color: #E3E5D5;
+}
+
+.navbar-brand {
+    text-decoration: none ;
+    font-style: italic;
+    color: #B39225 !important;
+    
+}
+
+.navbar-brand:hover {
+    text-decoration: none;
+}
+
+.nav-link{
+    color: rgb(0, 0, 0) !important;
+}
+.nav-link:hover{
+    color: rgb(120, 235, 120) !important;
+    text-decoration: underline;
+}
+
+.botonInicio{
+    padding: 10px !important;
+    background-color: black !important;
+    color: white !important;
+    border-radius: 15px !important;
+}
+
+/* Diseño del inicio */
+#descripcion {
+    opacity: 70%;
+}
+
+#imagenTitulo {
+    height: auto;
+    max-width: 75%;
+}
+
+#imagenSomos {
+    max-width: 50%;
+    border-radius: 15%;
+}
+
+#imagenMision {
+    max-width: 50%;
+    border-radius: 15%;
+}
+
+#imagenVision {
+    max-width: 50%;
+    border-radius: 15%;
+}
+
+#imagenProblematica {
+    max-width: 50%;
+    border-radius: 15%;
+}
