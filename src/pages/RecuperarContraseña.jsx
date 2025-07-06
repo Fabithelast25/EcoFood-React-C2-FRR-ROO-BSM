@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import { Link } from 'react-router-dom';
+import "../components/estilosCSS/recuperar_contraseña.css";
 
 function RecuperarContraseña() {
   const [email, setEmail] = useState('');
@@ -10,7 +11,8 @@ function RecuperarContraseña() {
     const auth = getAuth();
     try {
       await sendPasswordResetEmail(auth, email);
-      alert("Se ha enviado un correo electrónico de restablecimiento de contraseña a su dirección.");
+      alert("Se ha enviado un correo electrónico de restablecimiento de contraseña.");
+      setEmail(''); // Limpia el campo tras envío
     } catch (error) {
       alert(error.message);
     }
@@ -21,12 +23,10 @@ function RecuperarContraseña() {
   };
 
   return (
-    <div className="container mt-5">
-      <button type="button" className="btn btn-primary">
-        <Link to="/login" style={{ color: 'white', textDecoration: 'none' }}>
-          Volver
-        </Link>
-      </button>
+    <div className="recuperar-container">
+      <Link to="/login" className="btn btn-primary volver-btn">
+        Volver
+      </Link>
       <h2>Recuperar Contraseña</h2>
       <form onSubmit={handleResetPassword}>
         <div className="mb-3">
@@ -35,6 +35,7 @@ function RecuperarContraseña() {
             type="email"
             name="email"
             className="form-control"
+            placeholder="usuario@ejemplo.com"
             onChange={handleEmailChange}
             value={email}
             required
@@ -48,5 +49,6 @@ function RecuperarContraseña() {
 }
 
 export default RecuperarContraseña;
+
 
 

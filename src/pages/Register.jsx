@@ -5,6 +5,8 @@ import Swal from "sweetalert2";
 import { useNavigate, Link } from "react-router-dom";
 import { saveUserData } from "../services/userService";
 
+import "../components/estilosCSS/register.css";
+
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -73,11 +75,11 @@ export default function Register() {
   };
 
   return (
-    <div className="container mt-5">
-      <button type="button" className="btn btn-primary">
+    <div className="register-container">
+      <button type="button" className="btn btn-primary mb-3">
         <Link to="/login" style={{ color: "white", textDecoration: "none" }}>Volver</Link>
       </button>
-      <h2>Registro</h2>
+      <h2 className="mb-3">Registro</h2>
       <form onSubmit={handleRegister}>
         <div className="mb-3">
           <label className="form-label">Nombre completo</label>
@@ -173,3 +175,4 @@ export default function Register() {
     </div>
   );
 }
+
