@@ -8,15 +8,6 @@ import Swal from "sweetalert2";
 export default function PedidosCliente() {
   const { userData } = useAuth();
   const [pedidos, setPedidos] = useState([]);
-  const [busqueda, setBusqueda] = useState("");
-
-  const filtrarPedidos = () => {
-    return pedidos.filter((pedido) =>
-      pedido.productoNombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-      pedido.estado.toLowerCase().includes(busqueda.toLowerCase())
-    );
-  };
-
 
     useEffect(() => {
     const fetchPedidos = async () => {
@@ -164,19 +155,10 @@ export default function PedidosCliente() {
   return (
     <div className="container mt-4">
       <h3>Pedidos Cliente</h3>
-      <input
-        type="text"
-        placeholder="Buscar por producto o estado..."
-        className="form-control mb-3"
-        value={busqueda}
-        onChange={(e) => setBusqueda(e.target.value)}
-      />
       {pedidos.length === 0 ? (
         <p>No hay ningún pedido</p>
-      ) : filtrarPedidos().length === 0 ? (
-        <p>No se encontraron pedidos que coincidan con la búsqueda.</p>
       ) : (
-          <table className="table table-striped text-center">
+        <table className="table table-striped text-center">
           <thead>
             <tr>
               <th>Producto</th>
@@ -188,7 +170,7 @@ export default function PedidosCliente() {
             </tr>
           </thead>
           <tbody>
-            {filtrarPedidos().map((pedido) => (
+            {pedidos.map((pedido) => (
               <tr key={pedido.id}>
                 <td>{pedido.productoNombre}</td>
                 <td>{userData.nombre}</td>

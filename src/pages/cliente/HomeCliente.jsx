@@ -7,8 +7,10 @@ export default function HomeCliente() {
   const { userData } = useAuth();
 
   return (
-    <div className="container mt-4">
+    <div className="mt-4 px-3">
       <h1>¡Bienvenido{userData?.nombre ? `, ${userData.nombre}` : ""}!</h1>
+
+      {/* Aquí puedes agregar tarjetas, resumen de pedidos, botones, etc. */}
     </div>
   );
 }
