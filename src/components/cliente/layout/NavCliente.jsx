@@ -1,37 +1,24 @@
-import { useAuth } from "../../../context/AuthContext";
-import CerrarSesion from "../../CerrarSesion";
-import { Link } from "react-router-dom";
+// src/components/cliente/layout/NavCliente.jsx
+import { NavLink } from "react-router-dom";
 
 export default function NavCliente() {
-    const { userData } = useAuth();
-    return (
-        <nav className="navbar navbar-expand-lg bg-body-tertiary">
-            <div className="container-fluid">
-                <a className="navbar-brand" href="#">Ecofood {userData.nombre}</a>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bstarget="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle
-                navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse" id="navbarText">
-                    <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/cliente/HomeCliente">Dashboard</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/cliente/VerProductos">Ver Productos</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/cliente/MisPedidos">Mis Pedidos</Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/cliente/EditarPerfil">Perfil</Link>
-                        </li>
-                    </ul>
-                    <span className="navbar-text">
-                        <CerrarSesion />
-                    </span>
-                </div>
-            </div>
-        </nav>
-    );
+  return (
+    <nav className="sidebar bg-dark text-white p-3">
+      <h4 className="text-white mb-4">ECOFOOD</h4>
+      <ul className="nav flex-column">
+        <li className="nav-item">
+          <NavLink to="/cliente" className="nav-link text-white">Inicio</NavLink>
+        </li>
+        <li className="nav-item">
+          <NavLink to="/cliente/productos" className="nav-link text-white">Productos</NavLink>
+        </li>
+        <li className="nav-item">
+          <NavLink to="/cliente/pedidos" className="nav-link text-white">Mis Pedidos</NavLink>
+        </li>
+        <li className="nav-item">
+          <NavLink to="/cliente/contacto" className="nav-link text-white">Contacto</NavLink>
+        </li>
+      </ul>
+    </nav>
+  );
 }

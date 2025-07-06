@@ -1,37 +1,21 @@
-import { useAuth } from "../../../context/AuthContext";
-import CerrarSesion from "../../CerrarSesion";
-import { Link } from "react-router-dom";
+// src/components/empresa/layout/NavEmpresa.jsx
+import { NavLink } from "react-router-dom";
 
 export default function NavEmpresa() {
-    const { userData } = useAuth();
-    return (
-        <nav className="navbar navbar-expand-lg bg-body-tertiary">
-            <div className="container-fluid">
-                <a className="navbar-brand" href="#">Ecofood {userData.nombre}</a>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bstarget="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle
-                navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse" id="navbarText">
-                    <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li className="nav-item">
-                            <Link className="nav-link" to="/empresa/dashboard">Dashboard</Link>
-                        </li>
-                        <li>
-                            <Link className="nav-link" to="/empresa/producto">Producto</Link>
-                        </li>
-                        <li>
-                            <Link className="nav-link" to="/empresa/perfil">Perfil</Link>
-                        </li>
-                        <li>
-                            <Link className="nav-link" to="/empresa/pedidos">Pedidos Clientes</Link>
-                        </li>
-                    </ul>
-                    <span className="navbar-text">
-                        <CerrarSesion />
-                    </span>
-                </div>
-            </div>
-        </nav>
-    );
+  return (
+    <nav className="sidebar bg-dark text-white p-3">
+      <h4 className="text-white mb-4">ECOFOOD</h4>
+      <ul className="nav flex-column">
+        <li className="nav-item">
+          <NavLink to="/empresa/dashboard" className="nav-link text-white">Inicio</NavLink>
+        </li>
+        <li className="nav-item">
+          <NavLink to="/empresa/producto" className="nav-link text-white">Productos</NavLink>
+        </li>
+        <li className="nav-item">
+          <NavLink to="/empresa/pedidos" className="nav-link text-white">Pedidos</NavLink>
+        </li>
+      </ul>
+    </nav>
+  );
 }

@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
-import Landing_page from "../pages/Landing_page"
+import Home from "../pages/Home"
 import ProtectedRoute from './ProtectedRoute'
 import RecuperarContraseña from "../pages/RecuperarContraseña";
 import ProtectedByRole from './ProtectedByRole';
@@ -32,11 +32,15 @@ export default function AppRouter() {
     return (
         <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Landing_page />} />
+            <Route path="/" element={<Login />} />
             <Route path="/registro" element={<Register />} />
             <Route path="/recuperar-password" element={<RecuperarContraseña />} />
             <Route path="*" element={<NotFound />} />
-
+            <Route path="/home" element={ 
+                <ProtectedRoute> 
+                    <Home /> 
+                </ProtectedRoute> 
+        }/>
             <Route path="/cliente" element={
                 <ProtectedByRole allowed={["cliente"]}>
                     <ClienteLayout/>
@@ -53,7 +57,7 @@ export default function AppRouter() {
                 <ProtectedByRole allowed={["admin"]}>
                     <AdminLayout/>
                 </ProtectedByRole>
-            }>
+        }>
                 <Route path="dashboard" element={<AdminDashboard/>} />
                 <Route path="administradores" element={<AdminAdministradores/>} />
                 <Route path="empresas" element={<AdminEmpresas/>} />
