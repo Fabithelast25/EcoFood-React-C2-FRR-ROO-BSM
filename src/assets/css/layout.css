@@ -1,0 +1,83 @@
+/* layout.css */
+.sidebar {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-container {
+  padding: 1.5rem;
+  background-color: #fefefe;
+}
+
+.page-header {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Que el sidebar ocupe toda la altura */
+.sidebar {
+  min-height: 100vh;
+}
+
+/* Espaciado y estructura para el layout */
+.main-container {
+  padding: 1.5rem;
+}
+
+.page-header {
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid #dee2e6;
+  background-color: #f8f9fa;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.logo-img {
+  height: 48px;         /* más alto que antes */
+  width: auto;
+  border-radius: 999px; /* bordes completamente redondeados (ovalado) */
+  object-fit: cover;    /* por si la imagen no es ovalada originalmente */
+}
+
+/* Usuario con ícono */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Títulos de sección */
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.sidebar {
+  width: 250px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-container {
+  padding: 2rem;
+  flex: 1;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.sidebar-custom {
+  background-color: #0a4d68; /* Cambia por el color que prefieras */
+  color: white;
+}
+.sidebar-custom a {
+  color: white;
+}
