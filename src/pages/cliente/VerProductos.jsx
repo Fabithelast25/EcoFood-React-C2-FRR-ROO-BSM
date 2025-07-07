@@ -172,9 +172,6 @@ export default function VerProductos() {
                 <p className="card-text">
                   <strong>Disponible:</strong> {producto.cantidad} unidades
                 </p>
-                <p className="card-text">
-                  <strong>Fecha de creación:</strong> {producto.fechaCreacion}
-                </p>
                 <div className="d-flex align-items-center gap-2">
                   <input
                     type="number"
