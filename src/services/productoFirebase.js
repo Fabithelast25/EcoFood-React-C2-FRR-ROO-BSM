@@ -75,7 +75,7 @@ export const getProductosByEmpresaPagina = async (
 
   // Filtro de estado
   const hoy = new Date().toISOString().slice(0, 10);
-  if (estadoFiltro === "disponibles") {
+  if (estadoFiltro === "disponible") {
     filtros.push(where("vencimiento", ">", hoy));
   } else if (estadoFiltro === "por-vencer") {
     const en7 = new Date();
@@ -86,7 +86,6 @@ export const getProductosByEmpresaPagina = async (
   } else if (estadoFiltro === "vencidos") {
     filtros.push(where("vencimiento", "<=", hoy));
   }
-
   // Filtro de búsqueda por nombre
   if (busqueda) {
     filtros.push(where("nombre", ">=", busqueda));
@@ -158,6 +157,13 @@ export async function reducirStockProducto(productoId, cantidadARestar) {
       text: "No hay suficiente stock para entregar este pedido.",
     });
     return; // ← IMPORTANTE: corta la función aquí
+  }
+
+  if (nuevaCantidad === 0) {
+    await updateDoc(ref, {
+      cantidad: nuevaCantidad,
+      estado: "No disponible"
+    })
   }
 
   await updateDoc(ref, {

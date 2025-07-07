@@ -96,7 +96,7 @@ export default function Productos() {
               onChange={e => setEstadoFiltro(e.target.value)}
             >
               <option value="todos">Todos</option>
-              <option value="disponibles">Disponibles</option>
+              <option value="Disponibles">Disponibles</option>
               <option value="por-vencer">Por vencer</option>
               <option value="vencidos">Vencidos</option>
             </select>

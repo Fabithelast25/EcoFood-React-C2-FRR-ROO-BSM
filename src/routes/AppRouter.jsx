@@ -1,8 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
-import Home from "../pages/Home"
-import ProtectedRoute from './ProtectedRoute'
+import LandinPage from "../pages/Landing_page"
 import RecuperarContraseña from "../pages/RecuperarContraseña";
 import ProtectedByRole from './ProtectedByRole';
 import NotFound from "../pages/NotFound"
@@ -32,15 +31,11 @@ export default function AppRouter() {
     return (
         <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/" element={<Login />} />
+            <Route path="/" element={<LandinPage />} />
             <Route path="/registro" element={<Register />} />
             <Route path="/recuperar-password" element={<RecuperarContraseña />} />
             <Route path="*" element={<NotFound />} />
-            <Route path="/home" element={ 
-                <ProtectedRoute> 
-                    <Home /> 
-                </ProtectedRoute> 
-        }/>
+
             <Route path="/cliente" element={
                 <ProtectedByRole allowed={["cliente"]}>
                     <ClienteLayout/>

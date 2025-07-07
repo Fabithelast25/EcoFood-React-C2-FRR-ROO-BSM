@@ -7,16 +7,13 @@ export default function NavCliente() {
       <h4 className="text-white mb-4">ECOFOOD</h4>
       <ul className="nav flex-column">
         <li className="nav-item">
-          <NavLink to="/cliente" className="nav-link text-white">Inicio</NavLink>
+          <NavLink to="/cliente/HomeCliente" className="nav-link text-white">Inicio</NavLink>
         </li>
         <li className="nav-item">
-          <NavLink to="/cliente/productos" className="nav-link text-white">Productos</NavLink>
+          <NavLink to="/cliente/VerProductos" className="nav-link text-white">Productos</NavLink>
         </li>
         <li className="nav-item">
-          <NavLink to="/cliente/pedidos" className="nav-link text-white">Mis Pedidos</NavLink>
-        </li>
-        <li className="nav-item">
-          <NavLink to="/cliente/contacto" className="nav-link text-white">Contacto</NavLink>
+          <NavLink to="/cliente/MisPedidos" className="nav-link text-white">Mis Pedidos</NavLink>
         </li>
       </ul>
     </nav>
