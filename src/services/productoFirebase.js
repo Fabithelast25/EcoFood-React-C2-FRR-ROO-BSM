@@ -75,17 +75,23 @@ export const getProductosByEmpresaPagina = async (
 
   // Filtro de estado
   const hoy = new Date().toISOString().slice(0, 10);
-  if (estadoFiltro === "disponible") {
-    filtros.push(where("vencimiento", ">", hoy));
-  } else if (estadoFiltro === "por-vencer") {
-    const en7 = new Date();
-    en7.setDate(new Date().getDate() + 7);
-    const en7str = en7.toISOString().slice(0, 10);
-    filtros.push(where("vencimiento", ">", hoy));
-    filtros.push(where("vencimiento", "<=", en7str));
-  } else if (estadoFiltro === "vencidos") {
-    filtros.push(where("vencimiento", "<=", hoy));
-  }
+  if (estadoFiltro === "Disponible") {
+    
+  filtros.push(where("estado", "==", "Disponible"));
+  
+} else if (estadoFiltro === "por-vencer") {
+  const en7 = new Date();
+  en7.setDate(new Date().getDate() + 7);
+  const en7str = en7.toISOString().slice(0, 10);
+  filtros.push(where("estado", "==", "Disponible"));
+  filtros.push(where("vencimiento", ">", hoy));
+  filtros.push(where("vencimiento", "<=", en7str));
+} else if (estadoFiltro === "vencidos") {
+  filtros.push(where("vencimiento", "<=", hoy));
+} else if (estadoFiltro === "No disponible") {
+  filtros.push(where("estado", "==", "No disponible"));
+}
+
   // Filtro de búsqueda por nombre
   if (busqueda) {
     filtros.push(where("nombre", ">=", busqueda));

@@ -39,7 +39,6 @@ export default function HeaderAdmin({ toggleSidebar }) {
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
-                    <Dropdown.Item as={Link} to="/admin/perfil">Editar Perfil</Dropdown.Item>
                     <Dropdown.Divider />
                     <div className="px-3">
                         <CerrarSesion />

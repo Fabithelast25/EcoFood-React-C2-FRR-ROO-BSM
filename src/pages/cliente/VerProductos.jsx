@@ -9,7 +9,7 @@ import Swal from "sweetalert2";
 export default function VerProductos() {
   const [productos, setProductos] = useState([]);
   const [busqueda, setBusqueda] = useState("");
-  const [fechaFiltro, setFechaFiltro] = useState("");
+  const [orden, setOrden] = useState("ninguno");
   const [cantidades, setCantidades] = useState({});
   const [cantidadPorPagina, setCantidadPorPagina] = useState(5);
   const [paginaActual, setPaginaActual] = useState(1);
@@ -31,9 +31,18 @@ export default function VerProductos() {
               minute: "2-digit",
             }) || "Sin fecha";
 
-            const fechaSolo = data.fechaCreacion?.toDate?.().toISOString().slice(0, 10) || "";
+            const vencimiento = data.vencimiento?.toDate?.().toLocaleDateString("es-CL", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            }) || "No especificado";
 
-            return { ...data, id: doc.id, fechaCreacion, fechaSolo };
+            return {
+              ...data,
+              id: doc.id,
+              fechaCreacion,
+              vencimiento,
+            };
           })
           .filter((p) => p.estado?.toLowerCase() === "disponible" && p.cantidad > 0);
 
@@ -92,7 +101,7 @@ export default function VerProductos() {
       cantidadSolicitada,
       emailCliente: userData.email,
       estado: "pendiente",
-      fechaCreacion: serverTimestamp(), // ✅ importante
+      fechaCreacion: serverTimestamp(),
     };
 
     try {
@@ -104,11 +113,24 @@ export default function VerProductos() {
     }
   };
 
-  const productosFiltrados = productos.filter((p) => {
-    const coincideNombre = p.nombre.toLowerCase().includes(busqueda.toLowerCase());
-    const coincideFecha = fechaFiltro ? p.fechaSolo === fechaFiltro : true;
-    return coincideNombre && coincideFecha;
-  });
+  const productosFiltrados = productos
+    .filter((p) =>
+      p.nombre.toLowerCase().includes(busqueda.toLowerCase())
+    )
+    .sort((a, b) => {
+      switch (orden) {
+        case "precio-asc":
+          return a.precio - b.precio;
+        case "precio-desc":
+          return b.precio - a.precio;
+        case "nombre-asc":
+          return a.nombre.localeCompare(b.nombre);
+        case "nombre-desc":
+          return b.nombre.localeCompare(a.nombre);
+        default:
+          return 0;
+      }
+    });
 
   const totalPaginas = Math.ceil(productosFiltrados.length / cantidadPorPagina);
   const inicio = (paginaActual - 1) * cantidadPorPagina;
@@ -133,15 +155,17 @@ export default function VerProductos() {
         </div>
 
         <div className="col-md-4">
-          <input
-            type="date"
-            className="form-control"
-            value={fechaFiltro}
-            onChange={(e) => {
-              setFechaFiltro(e.target.value);
-              setPaginaActual(1);
-            }}
-          />
+          <select
+            className="form-select"
+            value={orden}
+            onChange={(e) => setOrden(e.target.value)}
+          >
+            <option value="ninguno">Ordenar por...</option>
+            <option value="precio-asc">Precio (menor a mayor)</option>
+            <option value="precio-desc">Precio (mayor a menor)</option>
+            <option value="nombre-asc">Nombre (A–Z)</option>
+            <option value="nombre-desc">Nombre (Z–A)</option>
+          </select>
         </div>
 
         <div className="col-md-4">
@@ -173,11 +197,11 @@ export default function VerProductos() {
                   <strong>Disponible:</strong> {producto.cantidad} unidades
                 </p>
                 <p className="card-text">
-                  <strong>Precio: </strong>
-                  {producto.precio}</p>
+                  <strong>Precio:</strong> {producto.precio}
+                </p>
                 <p className="card-text">
-                  <strong>Fecha Vencimiento: </strong>
-                  {producto.vencimiento}</p>
+                  <strong>Fecha de vencimiento:</strong> {producto.vencimiento}
+                </p>
                 <div className="d-flex align-items-center gap-2">
                   <input
                     type="number"

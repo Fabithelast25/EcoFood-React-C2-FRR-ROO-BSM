@@ -9,8 +9,10 @@ import Swal from "sweetalert2";
 export default function PedidosCliente() {
   const { userData } = useAuth();
   const [pedidos, setPedidos] = useState([]);
-  const [fechaFiltro, setFechaFiltro] = useState("");
   const [busqueda, setBusqueda] = useState("");
+  const [estadoFiltro, setEstadoFiltro] = useState("");
+  const [fechaFiltro, setFechaFiltro] = useState("");
+  const [ordenAlfabetico, setOrdenAlfabetico] = useState("asc");
   const [cantidadPorPagina, setCantidadPorPagina] = useState(5);
   const [paginaActual, setPaginaActual] = useState(1);
 
@@ -21,19 +23,18 @@ export default function PedidosCliente() {
       const datos = await obtenerPedidosPorEmail(userData.email);
 
       const pedidosConFecha = datos.map((pedido) => {
-        const fechaCreacion = pedido.fechaCreacion?.toDate?.().toLocaleString(
-          "es-CL",
-          {
-            day: "2-digit",
-            month: "2-digit",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-          }
-        ) || "Sin fecha";
+        const fecha = pedido.fechaCreacion?.toDate?.();
+        const fechaCreacion = fecha
+          ? fecha.toLocaleString("es-CL", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+              hour: "2-digit",
+              minute: "2-digit",
+            })
+          : "Sin fecha";
 
-        const fechaSolo =
-          pedido.fechaCreacion?.toDate?.().toISOString().slice(0, 10) || "";
+        const fechaSolo = fecha ? fecha.toISOString().slice(0, 10) : "";
 
         return { ...pedido, fechaCreacion, fechaSolo };
       });
@@ -71,20 +72,27 @@ export default function PedidosCliente() {
     }
   };
 
-  const pedidosFiltrados = pedidos.filter((pedido) => {
-    const coincideNombre = pedido.productoNombre
-      .toLowerCase()
-      .includes(busqueda.toLowerCase());
-    const coincideFecha = fechaFiltro ? pedido.fechaSolo === fechaFiltro : true;
-    return coincideNombre && coincideFecha;
-  });
+  const pedidosFiltrados = pedidos
+    .filter((pedido) =>
+      pedido.productoNombre.toLowerCase().includes(busqueda.toLowerCase())
+    )
+    .filter((pedido) =>
+      estadoFiltro ? pedido.estado === estadoFiltro : true
+    )
+    .filter((pedido) =>
+      fechaFiltro ? pedido.fechaSolo === fechaFiltro : true
+    )
+    .sort((a, b) => {
+      if (ordenAlfabetico === "asc") {
+        return a.productoNombre.localeCompare(b.productoNombre);
+      } else {
+        return b.productoNombre.localeCompare(a.productoNombre);
+      }
+    });
 
   const totalPaginas = Math.ceil(pedidosFiltrados.length / cantidadPorPagina);
   const inicio = (paginaActual - 1) * cantidadPorPagina;
-  const pedidosPagina = pedidosFiltrados.slice(
-    inicio,
-    inicio + cantidadPorPagina
-  );
+  const pedidosPagina = pedidosFiltrados.slice(inicio, inicio + cantidadPorPagina);
 
   if (!userData) return <p>Cargando usuario...</p>;
 
@@ -93,7 +101,38 @@ export default function PedidosCliente() {
       <h3>Mis Pedidos</h3>
 
       <div className="row mb-3">
-        <div className="col-md-4">
+        <div className="col-md-3">
+          <label>Buscar por nombre:</label>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Ej: arroz, leche..."
+            value={busqueda}
+            onChange={(e) => {
+              setBusqueda(e.target.value);
+              setPaginaActual(1);
+            }}
+          />
+        </div>
+
+        <div className="col-md-3">
+          <label>Filtrar por estado:</label>
+          <select
+            className="form-select"
+            value={estadoFiltro}
+            onChange={(e) => {
+              setEstadoFiltro(e.target.value);
+              setPaginaActual(1);
+            }}
+          >
+            <option value="">Todos</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="cancelado">Cancelado</option>
+            <option value="entregado">Entregado</option>
+          </select>
+        </div>
+
+        <div className="col-md-3">
           <label>Filtrar por fecha:</label>
           <input
             type="date"
@@ -106,33 +145,18 @@ export default function PedidosCliente() {
           />
         </div>
 
-        <div className="col-md-4">
-          <label>Buscar por nombre:</label>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Ej: manzana, arroz..."
-            value={busqueda}
-            onChange={(e) => {
-              setBusqueda(e.target.value);
-              setPaginaActual(1);
-            }}
-          />
-        </div>
-
-        <div className="col-md-4">
-          <label>Mostrar:</label>
+        <div className="col-md-3">
+          <label>Ordenar alfabéticamente:</label>
           <select
             className="form-select"
-            value={cantidadPorPagina}
+            value={ordenAlfabetico}
             onChange={(e) => {
-              setCantidadPorPagina(parseInt(e.target.value));
+              setOrdenAlfabetico(e.target.value);
               setPaginaActual(1);
             }}
           >
-            <option value={5}>5 pedidos</option>
-            <option value={10}>10 pedidos</option>
-            <option value={15}>15 pedidos</option>
+            <option value="asc">A → Z</option>
+            <option value="desc">Z → A</option>
           </select>
         </div>
       </div>
@@ -175,7 +199,6 @@ export default function PedidosCliente() {
             </tbody>
           </table>
 
-          {/* Paginación */}
           <nav>
             <ul className="pagination justify-content-center">
               {Array.from({ length: totalPaginas }, (_, i) => (

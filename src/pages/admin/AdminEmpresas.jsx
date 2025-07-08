@@ -11,7 +11,6 @@ export default function AdminEmpresas() {
   const [empresas, setEmpresas] = useState([]);
   const [empresaActiva, setEmpresaActiva] = useState(null);
   const [showModal, setShowModal] = useState(false);
-  const [showAsociarModal, setShowAsociarModal] = useState(false);
   const [mostrarPassword, setMostrarPassword] = useState(false);
   const [formData, setFormData] = useState({
     nombre: "",
@@ -22,16 +21,15 @@ export default function AdminEmpresas() {
     telefono: "",
     password: "",
   });
-  const [productoData, setProductoData] = useState({
-    nombre: "",
-    producto: "",
-  });
   const [errores, setErrores] = useState({});
-  const [erroresProducto, setErroresProducto] = useState({});
 
   const cargarEmpresas = async () => {
-    const data = await getEmpresas();
-    setEmpresas(data);
+    try {
+      const data = await getEmpresas();
+      setEmpresas(data);
+    } catch (error) {
+      Swal.fire("Error", "No se pudieron cargar las empresas.", "error");
+    }
   };
 
   const validarRut = (rut) => {
@@ -46,7 +44,8 @@ export default function AdminEmpresas() {
       multiplicador = multiplicador === 7 ? 2 : multiplicador + 1;
     }
     const dvEsperado = 11 - (suma % 11);
-    let dvCalculado = dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
+    let dvCalculado =
+      dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
     return dv === dvCalculado;
   };
 
@@ -82,7 +81,9 @@ export default function AdminEmpresas() {
       errs.email = "Correo electrónico no válido.";
     } else {
       const emailExistente = empresas.find(
-        (e) => e.email.trim().toLowerCase() === emailTrimmed && (!empresaActiva || e.id !== empresaActiva.id)
+        (e) =>
+          e.email.trim().toLowerCase() === emailTrimmed &&
+          (!empresaActiva || e.id !== empresaActiva.id)
       );
       if (emailExistente) {
         errs.email = "Este correo ya está asociado a otra empresa.";
@@ -104,18 +105,20 @@ export default function AdminEmpresas() {
     return errs;
   };
 
-  const validarProducto = () => {
-    const errs = {};
-    if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(productoData.nombre.trim())) {
-      errs.nombre = "El nombre de la empresa solo debe contener letras y espacios.";
-    }
-    return errs;
-  };
-
   const guardar = async () => {
     const erroresVal = validarDatos();
     if (Object.keys(erroresVal).length > 0) {
       setErrores(erroresVal);
+
+      // Mostrar SweetAlert con la lista de errores
+      const erroresHtml = Object.values(erroresVal)
+        .map((e) => `<li>${e}</li>`)
+        .join("");
+      Swal.fire({
+        icon: "error",
+        title: "Errores en el formulario",
+        html: `<ul style="text-align:left;">${erroresHtml}</ul>`,
+      });
       return;
     }
     setErrores({});
@@ -125,13 +128,19 @@ export default function AdminEmpresas() {
       delete dataToSave.password; // No actualizar contraseña si está vacía
     }
 
-    if (empresaActiva) {
-      await updateEmpresa(empresaActiva.id, dataToSave);
-    } else {
-      await addEmpresa(dataToSave);
+    try {
+      if (empresaActiva) {
+        await updateEmpresa(empresaActiva.id, dataToSave);
+        Swal.fire("Actualizado", "Empresa actualizada correctamente", "success");
+      } else {
+        await addEmpresa(dataToSave);
+        Swal.fire("Guardado", "Empresa creada correctamente", "success");
+      }
+      setShowModal(false);
+      cargarEmpresas();
+    } catch (error) {
+      Swal.fire("Error", "Ocurrió un error al guardar la empresa.", "error");
     }
-    setShowModal(false);
-    cargarEmpresas();
   };
 
   const eliminar = async (id) => {
@@ -140,10 +149,16 @@ export default function AdminEmpresas() {
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Sí",
+      cancelButtonText: "No",
     });
     if (result.isConfirmed) {
-      await deleteEmpresa(id);
-      cargarEmpresas();
+      try {
+        await deleteEmpresa(id);
+        Swal.fire("Eliminada", "Empresa eliminada correctamente", "success");
+        cargarEmpresas();
+      } catch (error) {
+        Swal.fire("Error", "No se pudo eliminar la empresa.", "error");
+      }
     }
   };
 
@@ -175,18 +190,6 @@ export default function AdminEmpresas() {
         Nueva Empresa
       </button>
 
-      <button
-        className="btn me-2"
-        style={{ backgroundColor: "#cc7000", color: "#ffffff" }}
-        onClick={() => {
-          setProductoData({ nombre: "", producto: "" });
-          setErroresProducto({});
-          setShowAsociarModal(true);
-        }}
-      >
-        Asociar Producto
-      </button>
-
       <table className="table mt-3">
         <thead>
           <tr>
@@ -196,6 +199,7 @@ export default function AdminEmpresas() {
             <th>Comuna</th>
             <th>Email</th>
             <th>Teléfono</th>
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -310,7 +314,7 @@ export default function AdminEmpresas() {
                 )}
                 {empresaActiva && (
                   <div className="form-text text-muted mb-2">
-                  El correo no se puede modificar una vez registrado.
+                    El correo no se puede modificar una vez registrado.
                   </div>
                 )}
                 <input
@@ -325,7 +329,10 @@ export default function AdminEmpresas() {
                     if (input.length === 0) {
                       setFormData({ ...formData, telefono: "" });
                     } else {
-                      const formatted = `+56 9 ${input.slice(1, 5)} ${input.slice(5, 9)}`.trim();
+                      const formatted = `+56 9 ${input.slice(1, 5)} ${input.slice(
+                        5,
+                        9
+                      )}`.trim();
                       setFormData({ ...formData, telefono: formatted });
                     }
                   }}
@@ -372,63 +379,7 @@ export default function AdminEmpresas() {
           </div>
         </div>
       )}
-
-      {/* Modal Asociar Producto */}
-      {showAsociarModal && (
-        <div className="modal d-block" tabIndex="-1">
-          <div className="modal-dialog">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Asociar Producto</h5>
-              </div>
-              <div className="modal-body">
-                <input
-                  className="form-control mb-2"
-                  placeholder="Nombre de la Empresa"
-                  maxLength={50}
-                  value={productoData.nombre}
-                  onChange={(e) =>
-                    setProductoData({ ...productoData, nombre: e.target.value })
-                  }
-                />
-                {erroresProducto.nombre && (
-                  <div className="text-danger mb-2">{erroresProducto.nombre}</div>
-                )}
-                <input
-                  className="form-control mb-2"
-                  placeholder="Nombre del Producto"
-                  maxLength={50}
-                  value={productoData.producto}
-                  onChange={(e) =>
-                    setProductoData({ ...productoData, producto: e.target.value })
-                  }
-                />
-              </div>
-              <div className="modal-footer">
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => setShowAsociarModal(false)}
-                >
-                  Cancelar
-                </button>
-                <button
-                  className="btn btn-success"
-                  onClick={() => {
-                    const erroresVal = validarProducto();
-                    if (Object.keys(erroresVal).length > 0) {
-                      setErroresProducto(erroresVal);
-                      return;
-                    }
-                    setErroresProducto({});
-                  }}
-                >
-                  Asociar
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
+

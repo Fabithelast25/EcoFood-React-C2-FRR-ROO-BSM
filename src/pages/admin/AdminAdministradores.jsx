@@ -28,7 +28,7 @@ export default function AdminAdministradores() {
     setAdmins(data);
   };
 
-const validarDatos = () => {
+  const validarDatos = () => {
     const errs = {};
     const emailTrimmed = formData.email.trim().toLowerCase();
 
@@ -82,8 +82,10 @@ const validarDatos = () => {
           direccion: formData.direccion,
           telefono: formData.telefono,
         });
+        Swal.fire("Actualizado", "Administrador actualizado correctamente.", "success");
       } else {
         await registrarAdministradorConAuth(formData);
+        Swal.fire("Agregado", "Administrador registrado correctamente.", "success");
       }
       setShowModal(false);
       cargarAdmins();
@@ -109,12 +111,18 @@ const validarDatos = () => {
       title: "¿Eliminar administrador?",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonText: "Sí"
+      confirmButtonText: "Sí",
+      cancelButtonText: "No"
     });
 
     if (result.isConfirmed) {
-      await deleteAdministrador(id);
-      cargarAdmins();
+      try {
+        await deleteAdministrador(id);
+        Swal.fire("Eliminado", "Administrador eliminado correctamente.", "success");
+        cargarAdmins();
+      } catch (error) {
+        Swal.fire("Error", error.message, "error");
+      }
     }
   };
 
@@ -126,18 +134,21 @@ const validarDatos = () => {
     <div className="container mt-5">
       <h2>Administradores</h2>
 
-      <button className="btn btn-primary mb-3" onClick={() => {
-        setAdminActivo(null);
-        setFormData({
-          nombre: "",
-          email: "",
-          comuna: "",
-          direccion: "",
-          telefono: "",
-          password: ""
-        });
-        setShowModal(true);
-      }}>
+      <button
+        className="btn btn-primary mb-3"
+        onClick={() => {
+          setAdminActivo(null);
+          setFormData({
+            nombre: "",
+            email: "",
+            comuna: "",
+            direccion: "",
+            telefono: "",
+            password: ""
+          });
+          setShowModal(true);
+        }}
+      >
         Nuevo Administrador
       </button>
 
@@ -174,6 +185,7 @@ const validarDatos = () => {
                       comuna: admin.comuna || "",
                       direccion: admin.direccion || "",
                       telefono: admin.telefono || "",
+                      password: ""
                     });
                     setShowModal(true);
                   }}
@@ -181,18 +193,20 @@ const validarDatos = () => {
                   Editar
                 </button>
                 <button
-                className="btn btn-danger btn-sm"
-                disabled={admin.principal}
-                onClick={() => eliminar(admin.id, admin.principal, admin.email)}
-              >
-                Eliminar
-              </button>
+                  className="btn btn-danger btn-sm"
+                  disabled={admin.principal}
+                  onClick={() => eliminar(admin.id, admin.principal, admin.email)}
+                >
+                  Eliminar
+                </button>
               </td>
             </tr>
           ))}
           {admins.length === 0 && (
             <tr>
-              <td colSpan="7" className="text-center">No hay administradores registrados.</td>
+              <td colSpan="7" className="text-center">
+                No hay administradores registrados.
+              </td>
             </tr>
           )}
         </tbody>
@@ -217,8 +231,8 @@ const validarDatos = () => {
                   maxLength={50}
                   required
                 />
-                {errores.nombre &&(
-                   <div className="text-danger mb-2">{errores.nombre}</div>
+                {errores.nombre && (
+                  <div className="text-danger mb-2">{errores.nombre}</div>
                 )}
                 <input
                   type="email"
@@ -228,7 +242,7 @@ const validarDatos = () => {
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   readOnly={!!adminActivo}
                 />
-                {errores.nombre &&(
+                {errores.email && (
                   <div className="text-danger mb-2">{errores.email}</div>
                 )}
                 <input
@@ -281,20 +295,20 @@ const validarDatos = () => {
                   <div className="text-danger mb-2">{errores.telefono}</div>
                 )}
                 {!adminActivo && (
-                <input
-                  type="password"
-                  className="form-control mb-2"
-                  placeholder="Contraseña"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  minLength={6}
-                  maxLength={20}
-                  required
-                />
-              )}
-              {errores.password && (
-                <div className="text-danger mb-2">{errores.password}</div>
-              )}
+                  <input
+                    type="password"
+                    className="form-control mb-2"
+                    placeholder="Contraseña"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    minLength={6}
+                    maxLength={20}
+                    required
+                  />
+                )}
+                {errores.password && (
+                  <div className="text-danger mb-2">{errores.password}</div>
+                )}
               </div>
               <div className="modal-footer">
                 <button className="btn btn-secondary" onClick={() => setShowModal(false)}>

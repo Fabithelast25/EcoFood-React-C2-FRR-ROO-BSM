@@ -62,20 +62,26 @@ export default function PedidosCliente() {
 
   // ----- Lógica de filtros -----
   const pedidosFiltrados = pedidos
-    .filter(p => 
-      p.productoNombre.toLowerCase().includes(busqueda.toLowerCase()) &&
-      (filtroEstado === "todos" || p.estado === filtroEstado)
-    )
-    .sort((a, b) => {
-      if (ordenNombre === "az") return a.productoNombre.localeCompare(b.productoNombre);
-      if (ordenNombre === "za") return b.productoNombre.localeCompare(a.productoNombre);
-      return 0;
-    })
-    .sort((a, b) => {
-      if (ordenFecha === "recientes") return b.fecha - a.fecha;
-      if (ordenFecha === "antiguos") return a.fecha - b.fecha;
-      return 0;
-    });
+  .filter(p => 
+    p.productoNombre.toLowerCase().includes(busqueda.toLowerCase()) &&
+    (filtroEstado === "todos" || p.estado === filtroEstado)
+  )
+  .sort((a, b) => {
+    if (ordenNombre === "az") {
+      return a.productoNombre.toLowerCase().localeCompare(b.productoNombre.toLowerCase());
+    }
+    if (ordenNombre === "za") {
+      return b.productoNombre.toLowerCase().localeCompare(a.productoNombre.toLowerCase());
+    }
+    if (ordenFecha === "recientes") {
+      return b.fecha.getTime() - a.fecha.getTime();
+    } 
+    if (ordenFecha === "antiguos") {
+      return a.fecha.getTime() - b.fecha.getTime();
+    }
+    return 0;
+  });
+
 
   const totalPaginas = Math.ceil(pedidosFiltrados.length / itemsPorPagina);
   const pedidosPaginados = pedidosFiltrados.slice(
